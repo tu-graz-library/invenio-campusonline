@@ -24,10 +24,10 @@ class InvenioCampusonline(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
-        app.extensions['invenio-campusonline'] = self
+        app.extensions["invenio-campusonline"] = self
 
     def init_config(self, app):
         """Initialize configuration."""
         for k in dir(config):
-            if k.startswith('INVENIO_CAMPUSONLINE_'):
+            if k.startswith("INVENIO_CAMPUSONLINE_"):
                 app.config.setdefault(k, getattr(config, k))
