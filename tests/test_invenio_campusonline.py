@@ -16,17 +16,18 @@ from invenio_campusonline import InvenioCampusonline
 def test_version():
     """Test version import."""
     from invenio_campusonline import __version__
+
     assert __version__
 
 
 def test_init():
     """Test extension initialization."""
-    app = Flask('testapp')
+    app = Flask("testapp")
     ext = InvenioCampusonline(app)
-    assert 'invenio-campusonline' in app.extensions
+    assert "invenio-campusonline" in app.extensions
 
-    app = Flask('testapp')
+    app = Flask("testapp")
     ext = InvenioCampusonline()
-    assert 'invenio-campusonline' not in app.extensions
+    assert "invenio-campusonline" not in app.extensions
     ext.init_app(app)
-    assert 'invenio-campusonline' in app.extensions
+    assert "invenio-campusonline" in app.extensions

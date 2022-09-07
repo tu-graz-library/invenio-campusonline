@@ -10,6 +10,6 @@
 
 from .ext import InvenioCampusonline
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
-__all__ = ('__version__', 'InvenioCampusonline')
+__all__ = ("__version__", "InvenioCampusonline")
