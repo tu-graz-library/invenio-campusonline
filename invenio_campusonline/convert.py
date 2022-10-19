@@ -47,6 +47,10 @@ class Visitor:
 class CampusOnlineToMarc21(Visitor):
     """Convertor from CampusOnline to Marc21."""
 
+    def __init__(self):
+        super().__init__()
+        self.author_name = "N/A"
+
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
 
@@ -76,10 +80,6 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_STATUSD(self, node: Element, record: Marc21Metadata):
         """Visit Status date."""
-        # TODO find out which field from cms is the real true, because
-        # my example does not worked 77334 does not have a entry as it
-        # is in alma
-        record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": ""})
 
     def visit_ORG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -149,7 +149,9 @@ class CampusOnlineToMarc21(Visitor):
         if not self.metaclass_name in ["AUTHOR", "TEXT", "SUPERVISOR"]:
             return
 
+        self.state = "metaobj"
         self.visit(node, record)
+        self.state = ""
 
     def visit_TYP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -188,9 +190,10 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_TIT(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        record.emplace_datafield(
-            "245.1.0.", subfs={"a": node.text, "c": self.author_name}
-        )
+        if self.state == "metaobj" and self.language == "DE":
+            record.emplace_datafield(
+                "245.1.0.", subfs={"a": node.text, "c": self.author_name}
+            )
 
     def visit_ABS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
