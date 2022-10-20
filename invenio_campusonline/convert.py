@@ -85,9 +85,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ORGP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        institute = ""
-        institute_english = ""
-        institute_number = ""
+        institute, institute_english, institute_number = node.text.split("&gt;")
         record.emplace_datafield(
             "971.5..",
             subfs={
@@ -105,7 +103,7 @@ class CampusOnlineToMarc21(Visitor):
         """Visit ."""
         record.emplace_datafield(
             "502...",
-            subfs={"b": node.text, "c": "Technische Universität Graz", "d": self.year},
+            subfs={"b": node.text, "c": "Technische Universität Graz"},
         )
 
     def visit_ZUGKB(self, node: Element, record: Marc21Metadata):
