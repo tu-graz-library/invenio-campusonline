@@ -7,7 +7,6 @@
 
 """Convert from CampusOnline to Marc21."""
 
-from xml import etree
 from xml.etree.ElementTree import Element
 
 from invenio_records_marc21.services.record.metadata import Marc21Metadata, QName
@@ -146,15 +145,12 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_metaobj(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        if not self.metaclass_name in ["AUTHOR", "TEXT", "SUPERVISOR"]:
+        if self.metaclass_name not in ["AUTHOR", "TEXT", "SUPERVISOR"]:
             return
 
         self.state = "metaobj"
         self.visit(node, record)
         self.state = ""
-
-    def visit_TYP(self, node: Element, record: Marc21Metadata):
-        """Visit ."""
 
     def visit_FN(self, node: Element, record: Marc21Metadata):
         """Visit ."""
