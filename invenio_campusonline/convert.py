@@ -52,6 +52,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
+        record.emplace_datafield("970.0.1.a", value=node.text)
 
     def visit_PAG(self, node, record: Marc21Metadata):
         """Visit PAG."""
@@ -160,9 +161,9 @@ class CampusOnlineToMarc21(Visitor):
         """Visit ."""
         if self.metaclass_name == "AUTHOR":
             self.author_name = node.text
-            record.emplace_datafield("100.1..", self.author_name)
+            record.emplace_datafield("100.1..", value=self.author_name)
         if self.metaclass_name == "SUPERVISOR":
-            record.emplace_datafield("971..0.a", node.text)
+            record.emplace_datafield("971..0.a", value=node.text)
 
     def visit_AKK(self, node: Element, record: Marc21Metadata):
         """Visit ."""
