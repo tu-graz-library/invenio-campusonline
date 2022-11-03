@@ -22,9 +22,9 @@ from .utils import fetch_to_import_ids, import_from_campusonline
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
     try:
-        url = current_app.config["CAMPUSONLINE_URL"]
-        token = current_app.config["CAMPUSONLINE_TOKEN"]
-        user_email = current_app.config["CAMPUSONLINE_USER_EMAIL"]
+        url = current_app.config["INVENIO_CAMPUSONLINE_URL"]
+        token = current_app.config["INVENIO_CAMPUSONLINE_TOKEN"]
+        user_email = current_app.config["INVENIO_CAMPUSONLINE_USER_EMAIL"]
 
         cms_ids = fetch_to_import_ids(url, token)
 
@@ -32,9 +32,9 @@ def import_theses_from_campusonline():
             import_from_campusonline(url, cms_id, token, user_email)
     except Exception:
         msg = Message(
-            "Something went wrong when fetching data from moodle",
-            sender=current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"],
-            recipients=current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"],
+            "Something went wrong when fetching data from campusonline",
+            sender=current_app.config["INVENIO_CAMPUSONLINE_ERROR_MAIL_SENDER"],
+            recipients=current_app.config["INVENIO_CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"],
             body=traceback.format_exc(),
         )
         current_app.extensions["mail"].send(msg)
