@@ -15,7 +15,7 @@ from celery import shared_task
 from flask import current_app
 from flask_mail import Message
 
-from .utils import fetch_to_import_ids, import_from_campusonline
+from .utils import fetch_all_ids, import_from_campusonline
 
 
 @shared_task(ignore_result=True)
@@ -25,8 +25,9 @@ def import_theses_from_campusonline():
         url = current_app.config["INVENIO_CAMPUSONLINE_URL"]
         token = current_app.config["INVENIO_CAMPUSONLINE_TOKEN"]
         user_email = current_app.config["INVENIO_CAMPUSONLINE_USER_EMAIL"]
+        theses_filter = current_app.config["INVENIO_CAMPUSONLINE_THESES_FILTER"]
 
-        cms_ids = fetch_to_import_ids(url, token)
+        cms_ids = fetch_all_ids(url, token, theses_filter)
 
         for cms_id in cms_ids:
             import_from_campusonline(url, cms_id, token, user_email)

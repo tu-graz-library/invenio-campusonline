@@ -68,7 +68,7 @@ def create_request_body_download(token, cms_id):
     return body.replace("TOKEN", token).replace("CMS_ID", cms_id)
 
 
-def create_request_body_ids(token):
+def create_request_body_ids(token, theses_filter=None):
     """Build request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -77,13 +77,21 @@ def create_request_body_ids(token):
       <soapenv:Body>
         <bas:getAllThesesMetadataRequest>
           <bas:token>TOKEN</bas:token>
-          <bas:thesesType>DIPLARB</bas:thesesType>
-          <bas:state name="IFG"/>
+          FILTER
         </bas:getAllThesesMetadataRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
-    return body.replace("TOKEN", token)
+
+    theses_filter = (
+        theses_filter
+        if theses_filter
+        else """
+    <bas:thesesType>DIPLARB</bas:thesesType>
+    <bas:state name="IFG"/>
+    """
+    )
+    return body.replace("TOKEN", token).replace("FILTER", theses_filter)
 
 
 def create_request_header(service):
@@ -103,7 +111,6 @@ def get_metadata(fetch_url, token, campusonline_id):
 
     root = fromstring(response.text)
 
-    # thesis = root.find("")
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
     thesis = list(root.iter(xpath))[0]  # TODO: fix it
     return thesis
@@ -147,9 +154,9 @@ def import_from_campusonline(fetch_url, campusonline_id, token, user_email):
     return record
 
 
-def fetch_to_import_ids(fetch_url, token):
+def fetch_all_ids(fetch_url, token, theses_filter=None):
     """Fetch to import ids."""
-    body = create_request_body_ids(token)
+    body = create_request_body_ids(token, theses_filter)
     headers = create_request_header("getAllThesesMetadataRequest")
     response = post(fetch_url, data=body, headers=headers)
 
