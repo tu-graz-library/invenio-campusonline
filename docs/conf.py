@@ -8,9 +8,7 @@
 
 """Sphinx configuration."""
 
-import os
-
-import sphinx.environment
+from invenio_campusonline import __version__
 
 # -- General configuration ------------------------------------------------
 
