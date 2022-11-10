@@ -15,17 +15,17 @@ from celery import shared_task
 from flask import current_app
 from flask_mail import Message
 
-from .utils import fetch_all_ids, import_from_campusonline
+from .api import fetch_all_ids, import_from_campusonline
 
 
 @shared_task(ignore_result=True)
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
     try:
-        url = current_app.config["INVENIO_CAMPUSONLINE_ENDPOINT"]
-        token = current_app.config["INVENIO_CAMPUSONLINE_TOKEN"]
-        user_email = current_app.config["INVENIO_CAMPUSONLINE_USER_EMAIL"]
-        theses_filter = current_app.config["INVENIO_CAMPUSONLINE_THESES_FILTER"]
+        url = current_app.config["CAMPUSONLINE_ENDPOINT"]
+        token = current_app.config["CAMPUSONLINE_TOKEN"]
+        user_email = current_app.config["CAMPUSONLINE_USER_EMAIL"]
+        theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
         cms_ids = fetch_all_ids(url, token, theses_filter)
 
@@ -34,8 +34,8 @@ def import_theses_from_campusonline():
     except Exception:
         msg = Message(
             "Something went wrong when fetching data from campusonline",
-            sender=current_app.config["INVENIO_CAMPUSONLINE_ERROR_MAIL_SENDER"],
-            recipients=current_app.config["INVENIO_CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"],
+            sender=current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"],
+            recipients=current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"],
             body=traceback.format_exc(),
         )
         current_app.extensions["mail"].send(msg)

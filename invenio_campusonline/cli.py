@@ -12,7 +12,7 @@ import click
 from click_params import URL
 from flask.cli import with_appcontext
 
-from .utils import fetch_all_ids, import_from_campusonline
+from .api import fetch_all_ids, import_from_campusonline
 
 
 @click.group()
