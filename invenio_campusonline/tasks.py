@@ -22,7 +22,7 @@ from .utils import fetch_all_ids, import_from_campusonline
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
     try:
-        url = current_app.config["INVENIO_CAMPUSONLINE_URL"]
+        url = current_app.config["INVENIO_CAMPUSONLINE_ENDPOINT"]
         token = current_app.config["INVENIO_CAMPUSONLINE_TOKEN"]
         user_email = current_app.config["INVENIO_CAMPUSONLINE_USER_EMAIL"]
         theses_filter = current_app.config["INVENIO_CAMPUSONLINE_THESES_FILTER"]
