@@ -11,11 +11,7 @@
 from shutil import copyfileobj
 from xml.etree.ElementTree import fromstring
 
-from invenio_config_tugraz import get_identity_from_user_by_email
-from invenio_records_marc21 import Marc21Metadata, create_record, current_records_marc21
 from requests import get, post
-
-from .convert import CampusOnlineToMarc21
 
 
 def create_request_body_metadata(token, cms_id):
@@ -83,24 +79,21 @@ def create_request_body_ids(token, theses_filter=None):
     </soapenv:Envelope>
     """
 
-    theses_filter = (
-        theses_filter
-        if theses_filter
-        else """
-    <bas:thesesType>DIPLARB</bas:thesesType>
-    <bas:state name="IFG"/>
-    """
-    )
-    return body.replace("TOKEN", token).replace("FILTER", theses_filter)
+    default_theses_filter = [
+        """<bas:thesesType>DIPLARB</bas:thesesType>""",
+        """<bas:state name="IFG"/>""",
+    ]
+    theses_filter = theses_filter if theses_filter else default_theses_filter
+    return body.replace("TOKEN", token).replace("FILTER", "\n".join(theses_filter))
 
 
 def create_request_header(service):
     """Create request header."""
-    headers = {
+    header = {
         "Content-Type": "application/xml",
         "SOAPAction": f"urn:service#{service}",
     }
-    return headers
+    return header
 
 
 def get_metadata(endpoint, token, campusonline_id):
@@ -135,32 +128,3 @@ def download_file(token, file_url, file_path):
     with get(file_url, stream=True) as response:
         with open(file_path, "wb") as fp:
             copyfileobj(response.raw, fp)
-
-
-def import_from_campusonline(endpoint, campusonline_id, token, user_email):
-    """Import record from campusonline."""
-    thesis = get_metadata(endpoint, token, campusonline_id)
-    convert = CampusOnlineToMarc21()
-    marc21_record = Marc21Metadata()
-
-    convert.visit(thesis, marc21_record)
-    file_url = get_file_url(endpoint, token, campusonline_id)
-    file_path = f"/tmp/{campusonline_id}.pdf"  # TODO add author name
-    download_file(token, file_url, file_path)
-
-    identity = get_identity_from_user_by_email(email=user_email)
-    service = current_records_marc21.records_service
-    record = create_record(service, marc21_record, file_path, identity)
-    return record
-
-
-def fetch_all_ids(endpoint, token, theses_filter=None):
-    """Fetch to import ids."""
-    body = create_request_body_ids(token, theses_filter)
-    headers = create_request_header("getAllThesesMetadataRequest")
-    response = post(endpoint, data=body, headers=headers)
-
-    root = fromstring(response.text)
-    xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-    ids = [node.text for node in root.iter(xpath)]
-    return ids

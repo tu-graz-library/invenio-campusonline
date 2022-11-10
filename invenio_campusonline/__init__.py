@@ -8,8 +8,14 @@
 
 """This module is used to import/export from/to the CampusOnline System."""
 
+from .api import fetch_all_ids, import_from_campusonline
 from .ext import InvenioCampusonline
 
 __version__ = "0.1.0"
 
-__all__ = ("__version__", "InvenioCampusonline")
+__all__ = (
+    "__version__",
+    "InvenioCampusonline",
+    "import_from_campusonline",
+    "fetch_all_ids",
+)
