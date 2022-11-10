@@ -103,11 +103,11 @@ def create_request_header(service):
     return headers
 
 
-def get_metadata(fetch_url, token, campusonline_id):
+def get_metadata(endpoint, token, campusonline_id):
     """Get Metadata."""
     body = create_request_body_metadata(token, campusonline_id)
     headers = create_request_header("getMetadataByThesisID")
-    response = post(fetch_url, data=body, headers=headers)
+    response = post(endpoint, data=body, headers=headers)
 
     root = fromstring(response.text)
 
@@ -116,11 +116,11 @@ def get_metadata(fetch_url, token, campusonline_id):
     return thesis
 
 
-def get_file_url(fetch_url, token, campusonline_id):
+def get_file_url(endpoint, token, campusonline_id):
     """Get file URL."""
     body = create_request_body_download(token, campusonline_id)
     headers = create_request_header("getDocumentByThesisID")
-    response = post(fetch_url, data=body, headers=headers)
+    response = post(endpoint, data=body, headers=headers)
 
     root = fromstring(response.text)
 
@@ -137,14 +137,14 @@ def download_file(token, file_url, file_path):
             copyfileobj(response.raw, fp)
 
 
-def import_from_campusonline(fetch_url, campusonline_id, token, user_email):
+def import_from_campusonline(endpoint, campusonline_id, token, user_email):
     """Import record from campusonline."""
-    thesis = get_metadata(fetch_url, token, campusonline_id)
+    thesis = get_metadata(endpoint, token, campusonline_id)
     convert = CampusOnlineToMarc21()
     marc21_record = Marc21Metadata()
 
     convert.visit(thesis, marc21_record)
-    file_url = get_file_url(fetch_url, token, campusonline_id)
+    file_url = get_file_url(endpoint, token, campusonline_id)
     file_path = f"/tmp/{campusonline_id}.pdf"  # TODO add author name
     download_file(token, file_url, file_path)
 
@@ -154,11 +154,11 @@ def import_from_campusonline(fetch_url, campusonline_id, token, user_email):
     return record
 
 
-def fetch_all_ids(fetch_url, token, theses_filter=None):
+def fetch_all_ids(endpoint, token, theses_filter=None):
     """Fetch to import ids."""
     body = create_request_body_ids(token, theses_filter)
     headers = create_request_header("getAllThesesMetadataRequest")
-    response = post(fetch_url, data=body, headers=headers)
+    response = post(endpoint, data=body, headers=headers)
 
     root = fromstring(response.text)
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"

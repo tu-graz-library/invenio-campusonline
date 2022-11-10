@@ -13,6 +13,8 @@ from invenio_records_marc21.services.record.metadata import Marc21Metadata, QNam
 
 
 class Visitor:
+    """Visitor base class."""
+
     def process(self, node: Element, record: Marc21Metadata):
         """Execute the corresponding method to the tag name."""
 
@@ -47,6 +49,7 @@ class CampusOnlineToMarc21(Visitor):
     """Convertor from CampusOnline to Marc21."""
 
     def __init__(self):
+        """Constructor."""
         super().__init__()
         self.author_name = "N/A"
 

@@ -8,8 +8,8 @@
 
 """This is the configuration file."""
 
-INVENIO_CAMPUSONLINE_URL = ""
-""""""
+INVENIO_CAMPUSONLINE_ENDPOINT = ""
+"""This is the endpoint to fetch the records."""
 
 INVENIO_CAMPUSONLINE_TOKEN = ""
 """"""
