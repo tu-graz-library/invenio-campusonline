@@ -41,5 +41,5 @@ class InvenioCampusonline(object):
                 app.config["INVENIO_MARC21_PERSISTENT_IDENTIFIERS"].update(
                     getattr(config, k)
                 )
-            if k.startswith("CAMPUSONLINE_"):
+            elif k.startswith("CAMPUSONLINE_"):
                 app.config.setdefault(k, getattr(config, k))
