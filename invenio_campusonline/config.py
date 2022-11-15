@@ -22,7 +22,7 @@ CAMPUSONLINE_USER_EMAIL = ""
 CAMPUSONLINE_ERROR_MAIL_SENDER = ""
 """This is the error mail sender."""
 
-CAMPUSONLINE_ERROR_MAIL_RECIPIENTS = ""
+CAMPUSONLINE_ERROR_MAIL_RECIPIENTS = []
 """This is the email adress to send error messages to be fixed in the repository."""
 
 CAMPUSONLINE_THESES_FILTER = []
