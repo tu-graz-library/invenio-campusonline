@@ -25,11 +25,18 @@ CAMPUSONLINE_ERROR_MAIL_SENDER = ""
 CAMPUSONLINE_ERROR_MAIL_RECIPIENTS = []
 """This is the email adress to send error messages to be fixed in the repository."""
 
-CAMPUSONLINE_THESES_FILTER = []
+CAMPUSONLINE_THESES_FILTERS = []
 """This filter provides the possibiliy to set filters for the fetched theses."""
 
+
 CAMPUSONLINE_CELERY_BEAT_SCHEDULE = {}
-"""Celery beat schedule for the theses import."""
+"""Celery beat schedule for the theses import.
+example configuration:
+    "campusonline": {
+        "task": "invenio_campusonline.tasks.import_theses_from_campusonline",
+        "schedule": crontab(minute=30, hour=2, day_of_month=10, month_of_year="2,7"),
+    }
+"""
 
 CAMPUSONLINE_PERSISTENT_IDENTIFIER_PROVIDERS = [
     providers.ExternalPIDProvider(
