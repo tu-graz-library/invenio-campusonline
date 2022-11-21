@@ -15,6 +15,7 @@ from invenio_records_marc21 import Marc21Metadata, create_record, current_record
 from requests import post
 
 from .convert import CampusOnlineToMarc21
+from .types import CampusOnlineId, ThesesFilter
 from .utils import (
     create_request_body_ids,
     create_request_header,
@@ -24,30 +25,41 @@ from .utils import (
 )
 
 
-def import_from_campusonline(endpoint, campusonline_id, token, user_email):
+def import_from_campusonline(
+    endpoint: str, cms_id: CampusOnlineId, token: str, user_email: str
+):
     """Import record from campusonline."""
-    thesis = get_metadata(endpoint, token, campusonline_id)
+    thesis = get_metadata(endpoint, token, cms_id.cms_id)
     convert = CampusOnlineToMarc21()
     marc21_record = Marc21Metadata()
 
     convert.visit(thesis, marc21_record)
-    file_url = get_file_url(endpoint, token, campusonline_id)
-    file_path = f"/tmp/{campusonline_id}.pdf"  # TODO add author name
+    file_url = get_file_url(endpoint, token, cms_id)
+    file_path = f"/tmp/{cms_id}.pdf"  # TODO add author name
     download_file(token, file_url, file_path)
 
     identity = get_identity_from_user_by_email(email=user_email)
     service = current_records_marc21.records_service
     record = create_record(service, marc21_record, file_path, identity)
+
+    # TODO: set access of record
+    # if cms.state == ThesesState.LOCKED
+    #   set file permission to restricted
+    # elif cms.state == ThesesState.OPEN
+    #   set file permission to public
+
     return record
 
 
-def fetch_all_ids(endpoint, token, theses_filter=None):
+def fetch_all_ids(endpoint: str, token: str, theses_filters: ThesesFilter = None):
     """Fetch to import ids."""
-    body = create_request_body_ids(token, theses_filter)
-    headers = create_request_header("getAllThesesMetadataRequest")
-    response = post(endpoint, data=body, headers=headers)
+    ids = []
+    for theses_filter, state in theses_filters:
+        body = create_request_body_ids(token, theses_filter)
+        headers = create_request_header("getAllThesesMetadataRequest")
+        response = post(endpoint, data=body, headers=headers)
 
-    root = fromstring(response.text)
-    xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-    ids = [node.text for node in root.iter(xpath)]
+        root = fromstring(response.text)
+        xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
+        ids += [CampusOnlineId(node.text, state) for node in root.iter(xpath)]
     return ids

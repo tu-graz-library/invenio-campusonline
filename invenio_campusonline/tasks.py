@@ -21,18 +21,18 @@ def config_variables():
     url = current_app.config["CAMPUSONLINE_ENDPOINT"]
     token = current_app.config["CAMPUSONLINE_TOKEN"]
     user_email = current_app.config["CAMPUSONLINE_USER_EMAIL"]
-    theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
+    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
     recipients = ",".join(current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"])
     sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
 
-    return url, token, user_email, theses_filter, recipients, sender
+    return url, token, user_email, theses_filters, recipients, sender
 
 
 @shared_task(ignore_result=True)
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
-    (url, token, user_email, theses_filter, recipients, sender) = config_variables()
-    cms_ids = fetch_all_ids(url, token, theses_filter)
+    url, token, user_email, theses_filters, recipients, sender = config_variables()
+    cms_ids = fetch_all_ids(url, token, theses_filters)
 
     for cms_id in cms_ids:
         try:
