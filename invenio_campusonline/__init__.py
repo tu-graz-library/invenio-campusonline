@@ -10,6 +10,7 @@
 
 from .api import fetch_all_ids, import_from_campusonline
 from .ext import InvenioCampusonline
+from .types import ThesesFilter, ThesesState
 
 __version__ = "0.1.0"
 
@@ -18,4 +19,6 @@ __all__ = (
     "InvenioCampusonline",
     "import_from_campusonline",
     "fetch_all_ids",
+    "ThesesFilter",
+    "ThesesState",
 )

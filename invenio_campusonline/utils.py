@@ -9,12 +9,14 @@
 """Command line interface to interact with the CampusOnline-Connector module."""
 
 from shutil import copyfileobj
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import Element, fromstring
 
 from requests import get, post
 
+from .types import CampusOnlineId
 
-def create_request_body_metadata(token, cms_id):
+
+def create_request_body_metadata(token: str, cms_id: str):
     """Build Request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -45,7 +47,7 @@ def create_request_body_metadata(token, cms_id):
     return body.replace("TOKEN", token).replace("CMS_ID", cms_id)
 
 
-def create_request_body_download(token, cms_id):
+def create_request_body_download(token: str, cms_id: str):
     """Build Request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -64,7 +66,7 @@ def create_request_body_download(token, cms_id):
     return body.replace("TOKEN", token).replace("CMS_ID", cms_id)
 
 
-def create_request_body_ids(token, theses_filter=None):
+def create_request_body_ids(token: str, theses_filter: list[Element] = None):
     """Build request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -87,7 +89,7 @@ def create_request_body_ids(token, theses_filter=None):
     return body.replace("TOKEN", token).replace("FILTER", "\n".join(theses_filter))
 
 
-def create_request_header(service):
+def create_request_header(service: str):
     """Create request header."""
     header = {
         "Content-Type": "application/xml",
@@ -96,9 +98,9 @@ def create_request_header(service):
     return header
 
 
-def get_metadata(endpoint, token, campusonline_id):
+def get_metadata(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     """Get Metadata."""
-    body = create_request_body_metadata(token, campusonline_id)
+    body = create_request_body_metadata(token, campusonline_id.cms_id)
     headers = create_request_header("getMetadataByThesisID")
     response = post(endpoint, data=body, headers=headers)
 
@@ -109,20 +111,19 @@ def get_metadata(endpoint, token, campusonline_id):
     return thesis
 
 
-def get_file_url(endpoint, token, campusonline_id):
+def get_file_url(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     """Get file URL."""
-    body = create_request_body_download(token, campusonline_id)
+    body = create_request_body_download(token, campusonline_id.cms_id)
     headers = create_request_header("getDocumentByThesisID")
     response = post(endpoint, data=body, headers=headers)
 
     root = fromstring(response.text)
-
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}docUrl"
     file_url = list(root.iter(xpath))[0]  # TODO: make it more nice
     return file_url.text
 
 
-def download_file(token, file_url, file_path):
+def download_file(token: str, file_url: str, file_path: str):
     """Download file."""
     file_url = f"{file_url}{token}"
     with get(file_url, stream=True) as response:
