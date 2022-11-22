@@ -41,3 +41,7 @@ class CampusOnlineId:
 
     def __iter__(self):
         return iter(astuple(self))
+
+
+URL = str
+CampusOnlineToken = str

@@ -15,7 +15,7 @@ from invenio_records_marc21 import Marc21Metadata, create_record, current_record
 from requests import post
 
 from .convert import CampusOnlineToMarc21
-from .types import CampusOnlineId, ThesesFilter
+from .types import URL, CampusOnlineId, CampusOnlineToken, ThesesFilter
 from .utils import (
     create_request_body_ids,
     create_request_header,
@@ -26,10 +26,14 @@ from .utils import (
 
 
 def import_from_campusonline(
-    endpoint: str, cms_id: CampusOnlineId, token: str, user_email: str
+    endpoint: URL, cms_id: CampusOnlineId, token: CampusOnlineToken, user_email: str
 ):
     """Import record from campusonline."""
-    thesis = get_metadata(endpoint, token, cms_id.cms_id)
+    thesis = get_metadata(endpoint, token, cms_id)
+
+    # TODO check if fulltext exists
+    # otherwise raise an exception
+
     convert = CampusOnlineToMarc21()
     marc21_record = Marc21Metadata()
 
@@ -51,11 +55,14 @@ def import_from_campusonline(
     return record
 
 
-def fetch_all_ids(endpoint: str, token: str, theses_filters: ThesesFilter = None):
+def fetch_all_ids(
+    endpoint: URL, token: CampusOnlineToken, theses_filters: ThesesFilter = None
+):
     """Fetch to import ids."""
     ids = []
     for theses_filter, state in theses_filters:
         body = create_request_body_ids(token, theses_filter)
+
         headers = create_request_header("getAllThesesMetadataRequest")
         response = post(endpoint, data=body, headers=headers)
 
