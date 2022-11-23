@@ -11,9 +11,10 @@
 from shutil import copyfileobj
 from xml.etree.ElementTree import Element, fromstring
 
+from invenio_records_marc21.services.records.utils import check_about_duplicate
 from requests import get, post
 
-from .types import CampusOnlineId
+from .types import CampusOnlineId, ThesesState
 
 
 def create_request_body_metadata(token: str, cms_id: str):
@@ -100,7 +101,7 @@ def create_request_header(service: str):
 
 def get_metadata(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     """Get Metadata."""
-    body = create_request_body_metadata(token, campusonline_id.cms_id)
+    body = create_request_body_metadata(token, campusonline_id)
     headers = create_request_header("getMetadataByThesisID")
     response = post(endpoint, data=body, headers=headers)
 
@@ -113,7 +114,7 @@ def get_metadata(endpoint: str, token: str, campusonline_id: CampusOnlineId):
 
 def get_file_url(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     """Get file URL."""
-    body = create_request_body_download(token, campusonline_id.cms_id)
+    body = create_request_body_download(token, campusonline_id)
     headers = create_request_header("getDocumentByThesisID")
     response = post(endpoint, data=body, headers=headers)
 
@@ -129,3 +130,9 @@ def download_file(token: str, file_url: str, file_path: str):
     with get(file_url, stream=True) as response:
         with open(file_path, "wb") as fp:
             copyfileobj(response.raw, fp)
+
+
+@check_about_duplicate.register
+def _(value: CampusOnlineId):
+    """Check about double CampusOnlineId."""
+    check_about_duplicate(str(value), value.category)

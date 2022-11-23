@@ -32,11 +32,11 @@ def config_variables():
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
     url, token, user_email, theses_filters, recipients, sender = config_variables()
-    cms_ids = fetch_all_ids(url, token, theses_filters)
+    ids = fetch_all_ids(url, token, theses_filters)
 
-    for cms_id in cms_ids:
+    for cms_id, state in ids:
         try:
-            import_from_campusonline(url, cms_id, token, user_email)
+            import_from_campusonline(url, cms_id, token, user_email, state)
         except Exception:
             msg = Message(
                 "ERROR: importing from campusonline",

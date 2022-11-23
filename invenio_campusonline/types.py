@@ -13,6 +13,8 @@ from dataclasses import astuple, dataclass
 from enum import Enum
 from xml.etree.ElementTree import Element
 
+from invenio_records_marc21.services.records.types import Marc21Category
+
 
 class ThesesState(Enum):
     """Theses State class."""
@@ -32,15 +34,10 @@ class ThesesFilter:
         return iter(astuple(self))
 
 
-@dataclass
-class CampusOnlineId:
+class CampusOnlineId(Marc21Category):
     """Campus online ID."""
 
-    cms_id: str
-    state: ThesesState
-
-    def __iter__(self):
-        return iter(astuple(self))
+    category: str = "995"
 
 
 URL = str

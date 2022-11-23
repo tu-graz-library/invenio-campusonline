@@ -15,7 +15,7 @@ from invenio_records_marc21 import Marc21Metadata, create_record, current_record
 from requests import post
 
 from .convert import CampusOnlineToMarc21
-from .types import URL, CampusOnlineId, CampusOnlineToken, ThesesFilter
+from .types import URL, CampusOnlineId, CampusOnlineToken, ThesesFilter, ThesesState
 from .utils import (
     create_request_body_ids,
     create_request_header,
@@ -26,13 +26,26 @@ from .utils import (
 
 
 def import_from_campusonline(
-    endpoint: URL, cms_id: CampusOnlineId, token: CampusOnlineToken, user_email: str
+    endpoint: URL,
+    cms_id: CampusOnlineId,
+    token: CampusOnlineToken,
+    user_email: str,
+    state: ThesesState,
 ):
     """Import record from campusonline."""
     thesis = get_metadata(endpoint, token, cms_id)
 
     # TODO check if fulltext exists
     # otherwise raise an exception
+    # <attr key="VOLLTEXT">J</attr>
+    ns = "http://www.campusonline.at/thesisservice/basetypes"
+    xpath = f".//{{{ns}}}attr[@key='VOLLTEXT']"
+    ele = thesis.find(xpath)
+
+    if ele is None:
+        raise RuntimeError("No information about files")
+    elif ele.text == "N":
+        raise RuntimeError("record has no accosiated file")
 
     convert = CampusOnlineToMarc21()
     marc21_record = Marc21Metadata()
@@ -57,7 +70,7 @@ def import_from_campusonline(
 
 def fetch_all_ids(
     endpoint: URL, token: CampusOnlineToken, theses_filters: ThesesFilter = None
-):
+) -> list[tuple(CampusOnlineId, ThesesState)]:
     """Fetch to import ids."""
     ids = []
     for theses_filter, state in theses_filters:
@@ -68,5 +81,5 @@ def fetch_all_ids(
 
         root = fromstring(response.text)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-        ids += [CampusOnlineId(node.text, state) for node in root.iter(xpath)]
+        ids += [(CampusOnlineId(node.text), state) for node in root.iter(xpath)]
     return ids
