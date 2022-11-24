@@ -7,70 +7,38 @@
 # file for more details.
 
 """API functions of the campusonline connector."""
-
+from typing import Callable
 from xml.etree.ElementTree import fromstring
 
-from invenio_config_tugraz import get_identity_from_user_by_email
-from invenio_records_marc21 import Marc21Metadata, create_record, current_records_marc21
 from requests import post
 
-from .convert import CampusOnlineToMarc21
-from .types import URL, CampusOnlineId, CampusOnlineToken, ThesesFilter, ThesesState
+from .types import (
+    URL,
+    CampusOnlineConfigs,
+    CampusOnlineID,
+    CampusOnlineToken,
+    ThesesFilter,
+    ThesesState,
+)
 from .utils import (
     create_request_body_ids,
     create_request_header,
     download_file,
-    get_file_url,
     get_metadata,
 )
 
 
 def import_from_campusonline(
-    endpoint: URL,
-    cms_id: CampusOnlineId,
-    token: CampusOnlineToken,
-    user_email: str,
-    state: ThesesState,
+    import_func: Callable, cms_id: CampusOnlineID, configs: CampusOnlineConfigs
 ):
     """Import record from campusonline."""
-    thesis = get_metadata(endpoint, token, cms_id)
-
-    # TODO check if fulltext exists
-    # otherwise raise an exception
-    # <attr key="VOLLTEXT">J</attr>
-    ns = "http://www.campusonline.at/thesisservice/basetypes"
-    xpath = f".//{{{ns}}}attr[@key='VOLLTEXT']"
-    ele = thesis.find(xpath)
-
-    if ele is None:
-        raise RuntimeError("No information about files")
-    elif ele.text == "N":
-        raise RuntimeError("record has no accosiated file")
-
-    convert = CampusOnlineToMarc21()
-    marc21_record = Marc21Metadata()
-
-    convert.visit(thesis, marc21_record)
-    file_url = get_file_url(endpoint, token, cms_id)
-    file_path = f"/tmp/{cms_id}.pdf"  # TODO add author name
-    download_file(token, file_url, file_path)
-
-    identity = get_identity_from_user_by_email(email=user_email)
-    service = current_records_marc21.records_service
-    record = create_record(service, marc21_record, file_path, identity)
-
-    # TODO: set access of record
-    # if cms.state == ThesesState.LOCKED
-    #   set file permission to restricted
-    # elif cms.state == ThesesState.OPEN
-    #   set file permission to public
-
-    return record
+    print("----------------- import_from_campusonline -----------------")
+    return import_func(cms_id, configs, get_metadata, download_file)
 
 
 def fetch_all_ids(
     endpoint: URL, token: CampusOnlineToken, theses_filters: ThesesFilter = None
-) -> list[tuple(CampusOnlineId, ThesesState)]:
+) -> list[tuple[CampusOnlineID, ThesesState]]:
     """Fetch to import ids."""
     ids = []
     for theses_filter, state in theses_filters:
@@ -81,5 +49,5 @@ def fetch_all_ids(
 
         root = fromstring(response.text)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-        ids += [(CampusOnlineId(node.text), state) for node in root.iter(xpath)]
+        ids += [(CampusOnlineID(node.text), state) for node in root.iter(xpath)]
     return ids

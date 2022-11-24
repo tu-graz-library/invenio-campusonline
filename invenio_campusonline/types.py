@@ -13,7 +13,11 @@ from dataclasses import astuple, dataclass
 from enum import Enum
 from xml.etree.ElementTree import Element
 
-from invenio_records_marc21.services.records.types import Marc21Category
+URL = str
+CampusOnlineToken = str
+CampusOnlineID = str
+FilePath = str
+EmailAddress = str
 
 
 class ThesesState(Enum):
@@ -34,11 +38,13 @@ class ThesesFilter:
         return iter(astuple(self))
 
 
-class CampusOnlineId(Marc21Category):
-    """Campus online ID."""
+@dataclass
+class CampusOnlineConfigs:
+    """Configs for campus online."""
 
-    category: str = "995"
-
-
-URL = str
-CampusOnlineToken = str
+    url: URL
+    token: CampusOnlineToken
+    user_email: EmailAddress
+    theses_filters: ThesesFilter
+    recipients: list[EmailAddress]
+    sender: EmailAddress
