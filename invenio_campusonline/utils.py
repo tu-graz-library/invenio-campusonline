@@ -11,13 +11,14 @@
 from shutil import copyfileobj
 from xml.etree.ElementTree import Element, fromstring
 
-from invenio_records_marc21.services.records.utils import check_about_duplicate
 from requests import get, post
 
-from .types import CampusOnlineId, ThesesState
+from .types import URL, CampusOnlineID, CampusOnlineToken, FilePath
 
 
-def create_request_body_metadata(token: str, cms_id: str):
+def create_request_body_metadata(
+    token: CampusOnlineToken, campusonline_id: CampusOnlineID
+):
     """Build Request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -26,7 +27,7 @@ def create_request_body_metadata(token: str, cms_id: str):
       <soapenv:Body>
         <bas:getMetadataByThesisIDRequest>
           <bas:token>TOKEN</bas:token>
-          <bas:ID>CMS_ID</bas:ID>
+          <bas:ID>CAMPUSONLINE_ID</bas:ID>
           <bas:attr key="ALL"/>
           <bas:classAttrKeySet>
             <bas:name>text</bas:name>
@@ -45,10 +46,12 @@ def create_request_body_metadata(token: str, cms_id: str):
     </soapenv:Envelope>
     """
 
-    return body.replace("TOKEN", token).replace("CMS_ID", cms_id)
+    return body.replace("TOKEN", token).replace("CAMPUSONLINE_ID", campusonline_id)
 
 
-def create_request_body_download(token: str, cms_id: str):
+def create_request_body_download(
+    token: CampusOnlineToken, campusonline_id: CampusOnlineID
+) -> str:
     """Build Request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -57,17 +60,19 @@ def create_request_body_download(token: str, cms_id: str):
       <soapenv:Body>
         <bas:getDocumentByThesisIDRequest>
           <bas:token>TOKEN</bas:token>
-          <bas:ID>CMS_ID</bas:ID>
+          <bas:ID>CAMPUSONLINE_ID</bas:ID>
           <bas:docType>VOLLTEXT</bas:docType>
         </bas:getDocumentByThesisIDRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
 
-    return body.replace("TOKEN", token).replace("CMS_ID", cms_id)
+    return body.replace("TOKEN", token).replace("CAMPUSONLINE_ID", campusonline_id)
 
 
-def create_request_body_ids(token: str, theses_filter: list[Element] = None):
+def create_request_body_ids(
+    token: CampusOnlineToken, theses_filter: list[Element] = None
+) -> str:
     """Build request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -90,7 +95,7 @@ def create_request_body_ids(token: str, theses_filter: list[Element] = None):
     return body.replace("TOKEN", token).replace("FILTER", "\n".join(theses_filter))
 
 
-def create_request_header(service: str):
+def create_request_header(service: str) -> dict:
     """Create request header."""
     header = {
         "Content-Type": "application/xml",
@@ -99,7 +104,9 @@ def create_request_header(service: str):
     return header
 
 
-def get_metadata(endpoint: str, token: str, campusonline_id: CampusOnlineId):
+def get_metadata(
+    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+) -> Element:
     """Get Metadata."""
     body = create_request_body_metadata(token, campusonline_id)
     headers = create_request_header("getMetadataByThesisID")
@@ -112,7 +119,9 @@ def get_metadata(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     return thesis
 
 
-def get_file_url(endpoint: str, token: str, campusonline_id: CampusOnlineId):
+def get_file_url(
+    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+) -> str:
     """Get file URL."""
     body = create_request_body_download(token, campusonline_id)
     headers = create_request_header("getDocumentByThesisID")
@@ -124,7 +133,9 @@ def get_file_url(endpoint: str, token: str, campusonline_id: CampusOnlineId):
     return file_url.text
 
 
-def download_file(token: str, file_url: str, file_path: str):
+def store_file_temporarily(
+    token: CampusOnlineToken, file_url: URL, file_path: FilePath
+):
     """Download file."""
     file_url = f"{file_url}{token}"
     with get(file_url, stream=True) as response:
@@ -132,7 +143,10 @@ def download_file(token: str, file_url: str, file_path: str):
             copyfileobj(response.raw, fp)
 
 
-@check_about_duplicate.register
-def _(value: CampusOnlineId):
-    """Check about double CampusOnlineId."""
-    check_about_duplicate(str(value), value.category)
+def download_file(
+    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+) -> FilePath:
+    file_url = get_file_url(endpoint, token, campusonline_id)
+    file_path = f"/tmp/{campusonline_id}.pdf"
+    store_file_temporarily(token, file_url, file_path)
+    return file_path

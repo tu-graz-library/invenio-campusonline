@@ -10,10 +10,11 @@
 
 import click
 from click_params import URL
+from flask import current_app
 from flask.cli import with_appcontext
 
 from .api import fetch_all_ids, import_from_campusonline
-from .types import CampusOnlineId, ThesesState
+from .types import ThesesState
 
 
 @click.group()
@@ -29,8 +30,10 @@ def campusonline():
 @click.option("--user-email", type=click.STRING, default="cms@tugraz.at")
 def import_thesis(endpoint, campusonline_id, token, user_email):
     """Import metadata and file (aka one thesis) from campusonline."""
-    cms_id = CampusOnlineId(campusonline_id, ThesesState.OPEN)
-    record = import_from_campusonline(endpoint, cms_id, token, user_email)
+    import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
+    record = import_from_campusonline(
+        endpoint, campusonline_id, token, user_email, ThesesState.OPEN, import_func
+    )
     print(f"record.id: {record.id}")
 
 
