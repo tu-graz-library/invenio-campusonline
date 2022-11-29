@@ -32,7 +32,6 @@ def import_from_campusonline(
     import_func: Callable, cms_id: CampusOnlineID, configs: CampusOnlineConfigs
 ):
     """Import record from campusonline."""
-    print("----------------- import_from_campusonline -----------------")
     return import_func(cms_id, configs, get_metadata, download_file)
 
 

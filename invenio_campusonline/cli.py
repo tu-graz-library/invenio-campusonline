@@ -14,7 +14,7 @@ from flask import current_app
 from flask.cli import with_appcontext
 
 from .api import fetch_all_ids, import_from_campusonline
-from .types import ThesesState
+from .types import CampusOnlineConfigs, ThesesState
 
 
 @click.group()
@@ -31,9 +31,8 @@ def campusonline():
 def import_thesis(endpoint, campusonline_id, token, user_email):
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    record = import_from_campusonline(
-        endpoint, campusonline_id, token, user_email, ThesesState.OPEN, import_func
-    )
+    configs = CampusOnlineConfigs(endpoint, token, user_email)
+    record = import_from_campusonline(import_func, campusonline_id, configs)
     print(f"record.id: {record.id}")
 
 

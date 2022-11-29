@@ -20,31 +20,28 @@ from .types import CampusOnlineConfigs
 def config_variables() -> CampusOnlineConfigs:
     """Configuration variables."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    url = current_app.config["CAMPUSONLINE_ENDPOINT"]
+    endpoint = current_app.config["CAMPUSONLINE_ENDPOINT"]
     token = current_app.config["CAMPUSONLINE_TOKEN"]
     user_email = current_app.config["CAMPUSONLINE_USER_EMAIL"]
     theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
-    recipients = ",".join(current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"])
+    recipients = current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
     sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
 
     return import_func, CampusOnlineConfigs(
-        url, token, user_email, theses_filters, recipients, sender
+        endpoint, token, user_email, theses_filters, recipients, sender
     )
 
 
 @shared_task(ignore_result=True)
 def import_theses_from_campusonline():
     """Import theses from campusonline."""
-    print(
-        "---------------------------task import_theses_from_campusonline---------------------------"
-    )
     import_func, configs = config_variables()
-    ids = fetch_all_ids(configs.url, configs.token, configs.theses_filters)
-    print(f"len: {len(ids)}")
+    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
+
     for cms_id, state in ids:
         try:
             import_from_campusonline(import_func, cms_id, configs)
-        except Exception:
+        except RuntimeError:
             msg = Message(
                 "ERROR: importing from campusonline",
                 sender=configs.sender,

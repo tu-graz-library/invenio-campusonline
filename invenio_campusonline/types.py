@@ -42,7 +42,7 @@ class ThesesFilter:
 class CampusOnlineConfigs:
     """Configs for campus online."""
 
-    url: URL
+    endpoint: URL
     token: CampusOnlineToken
     user_email: EmailAddress
     theses_filters: ThesesFilter
