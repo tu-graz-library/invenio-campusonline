@@ -71,7 +71,7 @@ def create_request_body_download(
 
 
 def create_request_body_ids(
-    token: CampusOnlineToken, theses_filter: list[Element] = None
+    token: CampusOnlineToken, theses_filter: list[Element]
 ) -> str:
     """Build request."""
     body = """
@@ -87,11 +87,6 @@ def create_request_body_ids(
     </soapenv:Envelope>
     """
 
-    default_theses_filter = [
-        """<bas:thesesType>DIPLARB</bas:thesesType>""",
-        """<bas:state name="IFG"/>""",
-    ]
-    theses_filter = theses_filter if theses_filter else default_theses_filter
     return body.replace("TOKEN", token).replace("FILTER", "\n".join(theses_filter))
 
 
