@@ -128,11 +128,8 @@ def get_file_url(
     return file_url.text
 
 
-def store_file_temporarily(
-    token: CampusOnlineToken, file_url: URL, file_path: FilePath
-):
+def store_file_temporarily(file_url: URL, file_path: FilePath):
     """Download file."""
-    file_url = f"{file_url}{token}"
     with get(file_url, stream=True) as response:
         with open(file_path, "wb") as fp:
             copyfileobj(response.raw, fp)
@@ -142,6 +139,7 @@ def download_file(
     endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
 ) -> FilePath:
     file_url = get_file_url(endpoint, token, campusonline_id)
+    file_url = f"{file_url}{token}"
     file_path = f"/tmp/{campusonline_id}.pdf"
-    store_file_temporarily(token, file_url, file_path)
+    store_file_temporarily(file_url, file_path)
     return file_path
