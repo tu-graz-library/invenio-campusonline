@@ -18,7 +18,7 @@ from .api import fetch_all_ids, import_from_campusonline
 from .types import CampusOnlineConfigs
 
 
-def config_variables() -> Callable, CampusOnlineConfigs:
+def config_variables() -> tuple[Callable, CampusOnlineConfigs]:
     """Configuration variables."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     endpoint = current_app.config["CAMPUSONLINE_ENDPOINT"]
@@ -34,7 +34,7 @@ def config_variables() -> Callable, CampusOnlineConfigs:
 
 
 @shared_task(ignore_result=True)
-def import_theses_from_campusonline():
+def import_theses_from_campusonline() -> None:
     """Import theses from campusonline."""
     import_func, configs = config_variables()
     ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)

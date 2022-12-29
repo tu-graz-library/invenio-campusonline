@@ -14,7 +14,7 @@ from flask import current_app
 from flask.cli import with_appcontext
 
 from .api import fetch_all_ids, import_from_campusonline
-from .types import CampusOnlineConfigs, ThesesState
+from .types import CampusOnlineConfigs
 
 
 @click.group()
@@ -31,9 +31,16 @@ def campusonline():
 def import_thesis(endpoint, campusonline_id, token, user_email):
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    configs = CampusOnlineConfigs(endpoint, token, user_email)
+    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
+    recipients = current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
+    sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
+
+    configs = CampusOnlineConfigs(
+        endpoint, token, user_email, theses_filters, recipients, sender
+    )
     record = import_from_campusonline(import_func, campusonline_id, configs)
-    print(f"record.id: {record.id}")
+
+    current_app.logger.info(f"record.id: {record.id}")
 
 
 @campusonline.command()
@@ -42,5 +49,7 @@ def import_thesis(endpoint, campusonline_id, token, user_email):
 @click.option("--token", type=click.STRING)
 def fetch_ids(endpoint, token):
     """Fetch all to import ids."""
-    ids = fetch_all_ids(endpoint, token)
-    print(ids)
+    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
+    ids = fetch_all_ids(endpoint, token, theses_filters)
+
+    current_app.logger.info(ids)

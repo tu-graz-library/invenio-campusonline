@@ -8,8 +8,6 @@
 
 """This is the configuration file."""
 
-from invenio_rdm_records.services.pids import providers
-
 CAMPUSONLINE_ENDPOINT = ""
 """This is the endpoint to fetch the records."""
 
@@ -37,19 +35,3 @@ example configuration:
         "schedule": crontab(minute=30, hour=2, day_of_month=10, month_of_year="2,7"),
     }
 """
-
-CAMPUSONLINE_PERSISTENT_IDENTIFIER_PROVIDERS = [
-    providers.ExternalPIDProvider(
-        "campusonline", "campusonline", label="CAMPUSONLINE ID"
-    )
-]
-"""Persistent identifier provider for campusonline."""
-
-CAMPUSONLINE_PERSISTENT_IDENTIFIERS = {
-    "campusonline": {
-        "providers": ["campusonline"],
-        "required": False,
-        "label": "CAMPUSONLINE",
-    }
-}
-"""Persistent identifiers for campusonline."""

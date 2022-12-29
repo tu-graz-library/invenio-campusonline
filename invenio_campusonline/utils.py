@@ -18,7 +18,7 @@ from .types import URL, CampusOnlineID, CampusOnlineToken, FilePath
 
 def create_request_body_metadata(
     token: CampusOnlineToken, campusonline_id: CampusOnlineID
-):
+) -> str:
     """Build Request."""
     body = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
