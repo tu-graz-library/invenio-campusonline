@@ -7,7 +7,7 @@
 # file for more details.
 
 """API functions of the campusonline connector."""
-from typing import Callable
+from typing import Callable, List, Tuple
 from xml.etree.ElementTree import fromstring
 
 from requests import post
@@ -37,7 +37,7 @@ def import_from_campusonline(
 
 def fetch_all_ids(
     endpoint: URL, token: CampusOnlineToken, theses_filters: ThesesFilter = None
-) -> list[tuple[CampusOnlineID, ThesesState]]:
+) -> List[Tuple[CampusOnlineID, ThesesState]]:
     """Fetch to import ids."""
     ids = []
     for theses_filter, state in theses_filters:
