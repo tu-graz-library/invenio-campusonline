@@ -53,6 +53,7 @@ class ThesesFilter:
     state: ThesesState
 
     def __iter__(self):
+        """This method makes the properties iterable."""
         return iter(astuple(self))
 
 

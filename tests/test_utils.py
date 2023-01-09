@@ -69,7 +69,7 @@ def test_create_request_body_download():
 
 def test_create_request_body_ids():
     """Test the create_request_body_ids function."""
-    body = create_request_body_ids("abcd")
+    body = create_request_body_ids("abcd", [])
     expected = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                       xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
@@ -77,12 +77,13 @@ def test_create_request_body_ids():
       <soapenv:Body>
         <bas:getAllThesesMetadataRequest>
           <bas:token>abcd</bas:token>
-          <bas:thesesType>DIPLARB</bas:thesesType>
-<bas:state name="IFG"/>
+          FILTER
         </bas:getAllThesesMetadataRequest>
       </soapenv:Body>
     </soapenv:Envelope>
-    """
+    """.replace(
+        "FILTER", "\n".join([])
+    )
     assert body == expected
 
     theses_filter = [
