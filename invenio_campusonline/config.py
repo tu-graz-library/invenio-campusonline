@@ -29,7 +29,11 @@ CAMPUSONLINE_THESES_FILTERS = []
 
 CAMPUSONLINE_CELERY_BEAT_SCHEDULE = {}
 """Celery beat schedule for the theses import.
-example configuration:
+
+This would be an example configuration:
+
+.. code-block:: python
+
     "campusonline": {
         "task": "invenio_campusonline.tasks.import_theses_from_campusonline",
         "schedule": crontab(minute=30, hour=2, day_of_month=10, month_of_year="2,7"),
