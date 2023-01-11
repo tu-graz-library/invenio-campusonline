@@ -11,7 +11,6 @@
 
 from dataclasses import astuple, dataclass
 from enum import Enum
-from typing import List
 from xml.etree.ElementTree import Element
 
 URL = str
@@ -50,7 +49,7 @@ class ThesesState(Enum):
 class ThesesFilter:
     """Filter dataclass."""
 
-    filter_: List[Element]
+    filter_: list[Element]
     state: ThesesState
 
     def __iter__(self):
@@ -66,5 +65,5 @@ class CampusOnlineConfigs:
     token: CampusOnlineToken
     user_email: EmailAddress
     theses_filters: ThesesFilter
-    recipients: List[EmailAddress]
+    recipients: list[EmailAddress]
     sender: EmailAddress

@@ -8,7 +8,7 @@
 
 
 """Celery tasks for `invenio-campusonline`."""
-from typing import Callable, Tuple
+from typing import Callable
 
 from celery import shared_task
 from flask import current_app
@@ -18,7 +18,7 @@ from .api import fetch_all_ids, import_from_campusonline
 from .types import CampusOnlineConfigs
 
 
-def config_variables() -> Tuple[Callable, CampusOnlineConfigs]:
+def config_variables() -> tuple[Callable, CampusOnlineConfigs]:
     """Configuration variables."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     endpoint = current_app.config["CAMPUSONLINE_ENDPOINT"]
