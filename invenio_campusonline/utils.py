@@ -8,7 +8,6 @@
 
 """Command line interface to interact with the CampusOnline-Connector module."""
 from shutil import copyfileobj
-from typing import List
 from xml.etree.ElementTree import Element, fromstring
 
 from requests import get, post
@@ -71,7 +70,7 @@ def create_request_body_download(
 
 
 def create_request_body_ids(
-    token: CampusOnlineToken, theses_filter: List[Element]
+    token: CampusOnlineToken, theses_filter: list[Element]
 ) -> str:
     """Build request."""
     body = """
