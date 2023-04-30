@@ -38,6 +38,18 @@ The address does not have to have a special format, but it has to be an email.
 """
 
 
+@dataclass(frozen=True)
+class Color:
+    """This class is for the output color management."""
+
+    neutral = "black"
+    error = "red"
+    warning = "yellow"
+    abort = "magenta"
+    success = "green"
+    alternate = ["blue", "cyan"]
+
+
 class ThesesState(Enum):
     """Theses State class."""
 
