@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.2 (release 2023-05-01)
+
+- cli: move to secho way from logger
+
+
 Version v0.1.1 (release 2023-01-11)
 
 - setup: remove python3.8 add python3.11 support
