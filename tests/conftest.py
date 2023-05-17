@@ -13,10 +13,19 @@ fixtures are available.
 """
 
 
+from pathlib import Path
+from xml.etree.ElementTree import Element, parse
+
 import pytest
 from flask import Flask
 
 from invenio_campusonline import InvenioCampusonline
+
+
+@pytest.fixture()
+def minimal_record() -> Element:
+    """Create minimal record."""
+    return parse(Path(__file__).parent / "minimal_record.xml")
 
 
 @pytest.fixture(scope="module")

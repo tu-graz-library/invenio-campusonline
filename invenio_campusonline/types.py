@@ -10,6 +10,7 @@
 """Types."""
 
 from dataclasses import astuple, dataclass
+from datetime import datetime
 from enum import Enum
 from xml.etree.ElementTree import Element
 
@@ -36,6 +37,23 @@ EmailAddress = str
 
 The address does not have to have a special format, but it has to be an email.
 """
+
+
+@dataclass(frozen=True)
+class Embargo:
+    """The class is for the embargo management."""
+
+    start: datetime = None
+    end: datetime = None
+
+    @property
+    def end_date(self) -> str:
+        """Calculate str date in format %Y-%m-%d."""
+        return self.end.strftime("%Y-%m-%d")
+
+    def __bool__(self) -> bool:
+        """Check if values are set, otherwise return is false."""
+        return bool(self.start and self.end)
 
 
 @dataclass(frozen=True)
