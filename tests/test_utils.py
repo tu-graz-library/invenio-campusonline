@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -16,7 +16,7 @@ from invenio_campusonline.utils import (
 )
 
 
-def test_create_request_body_metadata():
+def test_create_request_body_metadata() -> None:
     """Test the create_request_body_metadata function."""
     body = create_request_body_metadata("abcd", "efgh")
     expected = """
@@ -48,7 +48,7 @@ def test_create_request_body_metadata():
     assert body == expected
 
 
-def test_create_request_body_download():
+def test_create_request_body_download() -> None:
     """Test the create_request_body_download function."""
     body = create_request_body_download("abcd", "efgh")
     expected = """
@@ -67,7 +67,7 @@ def test_create_request_body_download():
     assert body == expected
 
 
-def test_create_request_body_ids():
+def test_create_request_body_ids() -> None:
     """Test the create_request_body_ids function."""
     body = create_request_body_ids("abcd", [])
     expected = """
@@ -82,7 +82,8 @@ def test_create_request_body_ids():
       </soapenv:Body>
     </soapenv:Envelope>
     """.replace(
-        "FILTER", "\n".join([])
+        "FILTER",
+        "\n".join([]),
     )
     assert body == expected
 
@@ -108,7 +109,7 @@ def test_create_request_body_ids():
     assert body == expected
 
 
-def test_create_request_header():
+def test_create_request_header() -> None:
     """Test the create_request_header function."""
     header = create_request_header("allThesesMetadataRequest")
     expected = {

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
 # file for more details.
 
 """Command line interface to interact with the CampusOnline-Connector module."""
+from pathlib import Path
 from shutil import copyfileobj
 from xml.etree.ElementTree import Element, fromstring
 
@@ -16,7 +17,8 @@ from .types import URL, CampusOnlineID, CampusOnlineToken, FilePath
 
 
 def create_request_body_metadata(
-    token: CampusOnlineToken, campusonline_id: CampusOnlineID
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
 ) -> str:
     """Build Request."""
     body = """
@@ -49,7 +51,8 @@ def create_request_body_metadata(
 
 
 def create_request_body_download(
-    token: CampusOnlineToken, campusonline_id: CampusOnlineID
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
 ) -> str:
     """Build Request."""
     body = """
@@ -70,7 +73,8 @@ def create_request_body_download(
 
 
 def create_request_body_ids(
-    token: CampusOnlineToken, theses_filter: list[Element]
+    token: CampusOnlineToken,
+    theses_filter: list[Element],
 ) -> str:
     """Build request."""
     body = """
@@ -91,35 +95,37 @@ def create_request_body_ids(
 
 def create_request_header(service: str) -> dict:
     """Create request header."""
-    header = {
+    return {
         "Content-Type": "application/xml",
         "SOAPAction": f"urn:service#{service}",
     }
-    return header
 
 
 def get_metadata(
-    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+    endpoint: URL,
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
 ) -> Element:
     """Get Metadata."""
     body = create_request_body_metadata(token, campusonline_id)
     headers = create_request_header("getMetadataByThesisID")
-    response = post(endpoint, data=body, headers=headers)
+    response = post(endpoint, data=body, headers=headers, timeout=10)
 
     root = fromstring(response.text)
 
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
-    thesis = list(root.iter(xpath))[0]  # TODO: fix it
-    return thesis
+    return list(root.iter(xpath))[0]  # TODO: fix it
 
 
 def get_file_url(
-    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+    endpoint: URL,
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
 ) -> str:
     """Get file URL."""
     body = create_request_body_download(token, campusonline_id)
     headers = create_request_header("getDocumentByThesisID")
-    response = post(endpoint, data=body, headers=headers)
+    response = post(endpoint, data=body, headers=headers, timeout=10)
 
     root = fromstring(response.text)
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}docUrl"
@@ -127,19 +133,21 @@ def get_file_url(
     return file_url.text
 
 
-def store_file_temporarily(file_url: URL, file_path: FilePath):
-    """This function stores files referenced by an url to the local file path."""
-    with get(file_url, stream=True) as response:
-        with open(file_path, "wb") as fp:
+def store_file_temporarily(file_url: URL, file_path: FilePath) -> None:
+    """Store the file referenced by url to the local file path."""
+    with get(file_url, stream=True, timeout=10) as response:  # noqa: SIM117
+        with Path(file_path).open("wb") as fp:
             copyfileobj(response.raw, fp)
 
 
 def download_file(
-    endpoint: URL, token: CampusOnlineToken, campusonline_id: CampusOnlineID
+    endpoint: URL,
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
 ) -> FilePath:
-    """This function downloads files from campus online."""
+    """Download files from campus online by campusonline_id."""
     file_url = get_file_url(endpoint, token, campusonline_id)
     file_url = f"{file_url}{token}"
-    file_path = f"/tmp/{campusonline_id}.pdf"
+    file_path = f"/tmp/{campusonline_id}.pdf"  # noqa: S108
     store_file_temporarily(file_url, file_path)
     return file_path

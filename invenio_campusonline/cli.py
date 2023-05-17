@@ -18,7 +18,7 @@ from .types import CampusOnlineConfigs, Color
 
 
 @group()
-def campusonline():
+def campusonline() -> None:
     """Campusonline CLI."""
 
 
@@ -28,8 +28,14 @@ def campusonline():
 @option("--campusonline-id", type=STRING)
 @option("--token", type=STRING)
 @option("--user-email", type=STRING, default="cms@tugraz.at")
-@option("--no-color", is_flag=True)
-def import_thesis(endpoint, campusonline_id, token, user_email, no_color=False):
+@option("--no-color", is_flag=True, default=False)
+def import_thesis(
+    endpoint: str,
+    campusonline_id: str,
+    token: str,
+    user_email: str,
+    no_color: bool,  # noqa: FBT001
+) -> None:
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
@@ -37,7 +43,12 @@ def import_thesis(endpoint, campusonline_id, token, user_email, no_color=False):
     sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
 
     configs = CampusOnlineConfigs(
-        endpoint, token, user_email, theses_filters, recipients, sender
+        endpoint,
+        token,
+        user_email,
+        theses_filters,
+        recipients,
+        sender,
     )
     record = import_from_campusonline(import_func, campusonline_id, configs)
 
@@ -50,7 +61,11 @@ def import_thesis(endpoint, campusonline_id, token, user_email, no_color=False):
 @option("--endpoint", type=URL)
 @option("--token", type=STRING)
 @option("--no-color", is_flag=True)
-def fetch_ids(endpoint, token, no_color):
+def fetch_ids(
+    endpoint: str,
+    token: str,
+    no_color: bool,  # noqa: FBT001
+) -> None:
     """Fetch all to import ids."""
     theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
     ids = fetch_all_ids(endpoint, token, theses_filters)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -40,14 +40,14 @@ The address does not have to have a special format, but it has to be an email.
 
 @dataclass(frozen=True)
 class Color:
-    """This class is for the output color management."""
+    """The class is for the output color management."""
 
     neutral = "black"
     error = "red"
     warning = "yellow"
     abort = "magenta"
     success = "green"
-    alternate = ["blue", "cyan"]
+    alternate = ("blue", "cyan")
 
 
 class ThesesState(Enum):
@@ -64,8 +64,8 @@ class ThesesFilter:
     filter_: list[Element]
     state: ThesesState
 
-    def __iter__(self):
-        """This method makes the properties iterable."""
+    def __iter__(self):  # noqa: ANN204
+        """Make the class iteratable."""
         return iter(astuple(self))
 
 
