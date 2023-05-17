@@ -7,9 +7,10 @@
 # file for more details.
 
 """API functions of the campusonline connector."""
-from typing import Callable
+from collections.abc import Callable
 from xml.etree.ElementTree import fromstring
 
+from invenio_records_resources.services.records.results import RecordItem
 from requests import post
 
 from .types import (
@@ -29,14 +30,18 @@ from .utils import (
 
 
 def import_from_campusonline(
-    import_func: Callable, cms_id: CampusOnlineID, configs: CampusOnlineConfigs
-):
+    import_func: Callable,
+    cms_id: CampusOnlineID,
+    configs: CampusOnlineConfigs,
+) -> RecordItem:
     """Import record from campusonline."""
     return import_func(cms_id, configs, get_metadata, download_file)
 
 
 def fetch_all_ids(
-    endpoint: URL, token: CampusOnlineToken, theses_filters: ThesesFilter = None
+    endpoint: URL,
+    token: CampusOnlineToken,
+    theses_filters: ThesesFilter = None,
 ) -> list[tuple[CampusOnlineID, ThesesState]]:
     """Fetch to import ids."""
     ids = []
@@ -44,7 +49,7 @@ def fetch_all_ids(
         body = create_request_body_ids(token, theses_filter)
 
         headers = create_request_header("getAllThesesMetadataRequest")
-        response = post(endpoint, data=body, headers=headers)
+        response = post(endpoint, data=body, headers=headers, timeout=10)
 
         root = fromstring(response.text)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
