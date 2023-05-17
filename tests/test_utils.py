@@ -8,11 +8,15 @@
 
 """Module utils."""
 
+from xml.etree.ElementTree import Element
+
+from invenio_campusonline.types import Embargo
 from invenio_campusonline.utils import (
     create_request_body_download,
     create_request_body_ids,
     create_request_body_metadata,
     create_request_header,
+    get_embargo_range,
 )
 
 
@@ -118,3 +122,18 @@ def test_create_request_header() -> None:
     }
 
     assert header == expected
+
+
+def test_get_embargo_range(minimal_record: Element) -> None:
+    """Test the get_embargo_range function."""
+    embargo = get_embargo_range(minimal_record)
+
+    assert embargo.end_date == "2025-03-03"
+    assert bool(Embargo()) is False
+
+    embargo = get_embargo_range(Element("root"))
+
+    assert bool(embargo) is False
+
+    if not bool(embargo := get_embargo_range(Element("root"))):
+        assert bool(embargo) is False

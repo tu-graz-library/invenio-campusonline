@@ -54,4 +54,5 @@ def fetch_all_ids(
         root = fromstring(response.text)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
         ids += [(CampusOnlineID(node.text), state) for node in root.iter(xpath)]
+
     return ids

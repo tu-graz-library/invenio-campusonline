@@ -7,13 +7,14 @@
 # file for more details.
 
 """Command line interface to interact with the CampusOnline-Connector module."""
+from datetime import datetime
 from pathlib import Path
 from shutil import copyfileobj
 from xml.etree.ElementTree import Element, fromstring
 
 from requests import get, post
 
-from .types import URL, CampusOnlineID, CampusOnlineToken, FilePath
+from .types import URL, CampusOnlineID, CampusOnlineToken, Embargo, FilePath
 
 
 def create_request_body_metadata(
@@ -99,6 +100,27 @@ def create_request_header(service: str) -> dict:
         "Content-Type": "application/xml",
         "SOAPAction": f"urn:service#{service}",
     }
+
+
+def get_embargo_range(thesis: Element) -> Element:
+    """Extract the embargo range."""
+    ns = "http://www.campusonline.at/thesisservice/basetypes"
+    xpath_start = f".//{{{ns}}}attr[@key='SPVON']"
+    xpath_end = f".//{{{ns}}}attr[@key='SPBIS']"
+    start = thesis.find(xpath_start)
+    end = thesis.find(xpath_end)
+
+    if start is None or end is None:
+        return Embargo()
+
+    if start.text is None or end.text is None:
+        return Embargo()
+
+    in_format = "%Y-%m-%d %H:%M:%S"
+    start_embargo = datetime.strptime(start.text, in_format)
+    end_embargo = datetime.strptime(end.text, in_format)
+
+    return Embargo(start_embargo, end_embargo)
 
 
 def get_metadata(
