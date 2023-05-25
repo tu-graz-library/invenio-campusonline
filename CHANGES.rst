@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.2.0 (release 2023-05-25)
+
+- utils: implement get_embargo_range
+- setup: migrate to ruff
+
+
 Version v0.1.2 (release 2023-05-01)
 
 - cli: move to secho way from logger
