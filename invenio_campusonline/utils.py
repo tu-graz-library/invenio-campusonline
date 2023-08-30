@@ -136,7 +136,7 @@ def get_metadata(
     root = fromstring(response.text)
 
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
-    return list(root.iter(xpath))[0]  # noqa: RUF015
+    return next(root.iter(xpath))
 
 
 def get_file_url(
@@ -151,13 +151,14 @@ def get_file_url(
 
     root = fromstring(response.text)
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}docUrl"
-    file_url = list(root.iter(xpath))[0]  # noqa: RUF015
+    file_url = next(root.iter(xpath))
+
     return file_url.text
 
 
 def store_file_temporarily(file_url: URL, file_path: FilePath) -> None:
     """Store the file referenced by url to the local file path."""
-    with get(file_url, stream=True, timeout=10) as response:  # noqa: SIM117
+    with get(file_url, stream=True, timeout=10) as response:
         with Path(file_path).open("wb") as fp:
             copyfileobj(response.raw, fp)
 
