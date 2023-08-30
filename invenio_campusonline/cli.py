@@ -13,7 +13,11 @@ from click_params import URL
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .api import fetch_all_ids, import_from_campusonline
+from .api import (
+    fetch_all_ids,
+    import_all_theses_from_campusonline,
+    import_from_campusonline,
+)
 from .types import CampusOnlineConfigs, Color
 
 
@@ -72,3 +76,26 @@ def fetch_ids(
 
     color = Color.success if not no_color else Color.neutral
     secho(f"ids: {ids}", fg=color)
+
+
+@campusonline.command()
+@with_appcontext
+@option("--endpoint", type=URL)
+@option("--token", type=STRING)
+@option("--user-email", type=STRING, default="cms@tugraz.at")
+def full_sync(endpoint: str, token: str, user_email: str) -> None:
+    """Full sync."""
+    import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
+    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
+    recipients = current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
+    sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
+
+    configs = CampusOnlineConfigs(
+        endpoint,
+        token,
+        user_email,
+        theses_filters,
+        recipients,
+        sender,
+    )
+    import_all_theses_from_campusonline(import_func, configs)

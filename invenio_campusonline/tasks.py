@@ -12,9 +12,8 @@ from collections.abc import Callable
 
 from celery import shared_task
 from flask import current_app
-from flask_mail import Message
 
-from .api import fetch_all_ids, import_from_campusonline
+from .api import import_all_theses_from_campusonline
 from .types import CampusOnlineConfigs
 
 
@@ -42,16 +41,4 @@ def config_variables() -> tuple[Callable, CampusOnlineConfigs]:
 def import_theses_from_campusonline() -> None:
     """Import theses from campusonline."""
     import_func, configs = config_variables()
-    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
-
-    for cms_id, _ in ids:
-        try:
-            import_from_campusonline(import_func, cms_id, configs)
-        except RuntimeError:
-            msg = Message(
-                "ERROR: importing from campusonline",
-                sender=configs.sender,
-                recipients=configs.recipients,
-                body=f"thesis id: {cms_id}",
-            )
-            current_app.extensions["mail"].send(msg)
+    import_all_theses_from_campusonline(import_func, configs)
