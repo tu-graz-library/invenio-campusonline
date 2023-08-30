@@ -7,9 +7,12 @@
 # file for more details.
 
 """API functions of the campusonline connector."""
+
 from collections.abc import Callable
 from xml.etree.ElementTree import fromstring
 
+from flask import current_app
+from flask_mail import Message
 from invenio_records_resources.services.records.results import RecordItem
 from requests import post
 
@@ -56,3 +59,23 @@ def fetch_all_ids(
         ids += [(CampusOnlineID(node.text), state) for node in root.iter(xpath)]
 
     return ids
+
+
+def import_all_theses_from_campusonline(
+    import_func: Callable,
+    configs: CampusOnlineConfigs,
+) -> None:
+    """Import all theses from campusonline."""
+    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
+
+    for cms_id, _ in ids:
+        try:
+            import_from_campusonline(import_func, cms_id, configs)
+        except RuntimeError:
+            msg = Message(
+                "ERROR: importing from campusonline",
+                sender=configs.sender,
+                recipients=configs.recipients,
+                body=f"thesis id: {cms_id}",
+            )
+            current_app.extensions["mail"].send(msg)
