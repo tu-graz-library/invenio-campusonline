@@ -7,6 +7,8 @@
 # file for more details.
 
 """Command line interface to interact with the CampusOnline-Connector module."""
+
+from datetime import date as Date
 from datetime import datetime
 from pathlib import Path
 from shutil import copyfileobj
@@ -14,7 +16,48 @@ from xml.etree.ElementTree import Element, fromstring
 
 from requests import get, post
 
-from .types import URL, CampusOnlineID, CampusOnlineToken, Embargo, FilePath
+from .types import (
+    URL,
+    CampusOnlineID,
+    CampusOnlineStatus,
+    CampusOnlineToken,
+    Embargo,
+    FilePath,
+)
+
+
+def as_date(value: datetime) -> Date:
+    """As Date."""
+    return value.date()
+
+
+def create_request_body_status(
+    token: CampusOnlineToken,
+    campusonline_id: CampusOnlineID,
+    status: CampusOnlineStatus,
+    date: str,
+) -> None:
+    """Create request body status."""
+    body = """
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <bas:setThesisStatusByIDRequest>
+          <bas:token>TOKEN</bas:token>
+          <bas:ID>CAMPUSONLINE_ID</bas:ID>
+          <bas:status>STATUS</bas:status>
+          <bas:statusDate>DATE</bas:statusDate>
+        </bas:setThesisStatusByIDRequest>
+      </soapenv:Body>
+    </soapenv:Envelope>
+    """
+
+    return (
+        body.replace("TOKEN", token)
+        .replace("CAMPUSONLINE_ID", campusonline_id)
+        .replace("STATUS", status)
+        .replace("DATE", date)
+    )
 
 
 def create_request_body_metadata(

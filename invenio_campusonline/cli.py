@@ -8,7 +8,9 @@
 """Command line interface to interact with the CampusOnline-Connector module."""
 
 
-from click import STRING, group, option, secho
+from datetime import date as Date
+
+from click import STRING, Choice, DateTime, group, option, secho
 from click_params import URL
 from flask import current_app
 from flask.cli import with_appcontext
@@ -17,8 +19,10 @@ from .api import (
     fetch_all_ids,
     import_all_theses_from_campusonline,
     import_from_campusonline,
+    set_status,
 )
 from .types import CampusOnlineConfigs, Color
+from .utils import as_date
 
 
 @group()
@@ -64,7 +68,7 @@ def import_thesis(
 @with_appcontext
 @option("--endpoint", type=URL)
 @option("--token", type=STRING)
-@option("--no-color", is_flag=True)
+@option("--no-color", is_flag=True, default=False)
 def fetch_ids(
     endpoint: str,
     token: str,
@@ -99,3 +103,25 @@ def full_sync(endpoint: str, token: str, user_email: str) -> None:
         sender,
     )
     import_all_theses_from_campusonline(import_func, configs)
+
+
+@campusonline.command()
+@with_appcontext
+@option("--campusonline-id", type=STRING)
+@option("--endpoint", type=URL)
+@option("--token", type=STRING)
+@option("--status", type=Choice(["ARCHIVED", "PUBLISHED"], case_sensitive=True))
+@option("--date", type=DateTime(["%Y-%m-%d"]), callback=as_date)
+@option("--no-color", is_flag=True, default=False)
+def update_status(
+    campusonline_id: str,
+    endpoint: str,
+    token: str,
+    status: str,
+    date: Date,
+    no_color: bool,  # noqa: FBT001
+) -> None:
+    """Update status."""
+    response = set_status(endpoint, token, campusonline_id, status, date)
+    color = Color.success if not no_color else Color.neutral
+    secho(f"response: {response}", fg=color)
