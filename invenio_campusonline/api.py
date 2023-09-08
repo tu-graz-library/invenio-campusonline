@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -9,6 +9,7 @@
 """API functions of the campusonline connector."""
 
 from collections.abc import Callable
+from datetime import date as Date
 from xml.etree.ElementTree import fromstring
 
 from flask import current_app
@@ -20,12 +21,14 @@ from .types import (
     URL,
     CampusOnlineConfigs,
     CampusOnlineID,
+    CampusOnlineStatus,
     CampusOnlineToken,
     ThesesFilter,
     ThesesState,
 )
 from .utils import (
     create_request_body_ids,
+    create_request_body_status,
     create_request_header,
     download_file,
     get_metadata,
@@ -79,3 +82,17 @@ def import_all_theses_from_campusonline(
                 body=f"thesis id: {cms_id}",
             )
             current_app.extensions["mail"].send(msg)
+
+
+def set_status(
+    endpoint: URL,
+    token: CampusOnlineToken,
+    cms_id: CampusOnlineID,
+    status: CampusOnlineStatus,
+    date: Date,
+) -> str:
+    """Set status."""
+    body = create_request_body_status(token, cms_id, status, date)
+    headers = create_request_header("setThesisStatusByIDRequest")
+    response = post(endpoint, data=body, headers=headers, timeout=10)
+    return fromstring(response.text)

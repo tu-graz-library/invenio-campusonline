@@ -29,6 +29,12 @@ CampusOnlineID = str
 It will not have a special schema.
 """
 
+CampusOnlineStatus = str
+"""Type to indicate the status of the record in the campus online system.
+
+The value could be either ARCHIVED or PUBLISHED.
+"""
+
 FilePath = str
 """The path to the file on the local machine."""
 
