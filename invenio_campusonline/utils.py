@@ -136,7 +136,7 @@ def get_metadata(
     root = fromstring(response.text)
 
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
-    return list(root.iter(xpath))[0]  # TODO: fix it
+    return list(root.iter(xpath))[0]  # noqa: RUF015
 
 
 def get_file_url(
@@ -151,7 +151,7 @@ def get_file_url(
 
     root = fromstring(response.text)
     xpath = "{http://www.campusonline.at/thesisservice/basetypes}docUrl"
-    file_url = list(root.iter(xpath))[0]  # TODO: make it more nice
+    file_url = list(root.iter(xpath))[0]  # noqa: RUF015
     return file_url.text
 
 
