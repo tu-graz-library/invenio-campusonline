@@ -8,6 +8,16 @@
 Changes
 =======
 
+Version v0.3.0 (release 2023-11-03)
+
+- cli: add command duplicate-check
+- setup: increase min python version
+- cli: add command set_status
+- ruff: remove todos
+- cli: add full sync command
+- ruff rules update
+
+
 Version v0.2.0 (release 2023-05-25)
 
 - utils: implement get_embargo_range
