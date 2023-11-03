@@ -16,6 +16,7 @@ from flask import current_app
 from flask.cli import with_appcontext
 
 from .api import (
+    duplicate_check_campusonline,
     fetch_all_ids,
     import_all_theses_from_campusonline,
     import_from_campusonline,
@@ -103,6 +104,30 @@ def full_sync(endpoint: str, token: str, user_email: str) -> None:
         sender,
     )
     import_all_theses_from_campusonline(import_func, configs)
+
+
+@campusonline.command()
+@with_appcontext
+@option("--endpoint", type=URL, required=True)
+@option("--token", type=STRING, required=True)
+@option("--campusonline-id", type=STRING, default="")
+def duplicate_check(endpoint: str, token: str, campusonline_id: str) -> None:
+    """Duplicate check."""
+    duplicate_func = current_app.config["CAMPUSONLINE_DUPLICATE_FUNC"]
+    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
+
+    configs = CampusOnlineConfigs(
+        endpoint,
+        token,
+        "",
+        theses_filters,
+        [],
+        "",
+    )
+    duplicates = duplicate_check_campusonline(duplicate_func, configs, campusonline_id)
+
+    for duplicate in duplicates:
+        secho(duplicate, fg=Color.neutral)
 
 
 @campusonline.command()
