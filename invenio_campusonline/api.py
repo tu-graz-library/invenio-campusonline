@@ -84,6 +84,26 @@ def import_all_theses_from_campusonline(
             current_app.extensions["mail"].send(msg)
 
 
+def duplicate_check_campusonline(
+    duplicate_func: Callable,
+    configs: CampusOnlineConfigs,
+    campusonline_id: str,
+) -> list:
+    """Duplicate check campusonline."""
+    if campusonline_id == "":
+        ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
+    else:
+        ids = [(campusonline_id, "")]
+
+    duplicates = []
+
+    for cms_id, _ in ids:
+        if duplicate_func(cms_id):
+            duplicates.append(cms_id)
+
+    return duplicates
+
+
 def set_status(
     endpoint: URL,
     token: CampusOnlineToken,
