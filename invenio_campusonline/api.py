@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -24,7 +24,6 @@ from .types import (
     CampusOnlineStatus,
     CampusOnlineToken,
     ThesesFilter,
-    ThesesState,
 )
 from .utils import (
     create_request_body_ids,
@@ -47,19 +46,17 @@ def import_from_campusonline(
 def fetch_all_ids(
     endpoint: URL,
     token: CampusOnlineToken,
-    theses_filters: ThesesFilter = None,
-) -> list[tuple[CampusOnlineID, ThesesState]]:
+    theses_filter: ThesesFilter = None,
+) -> list[CampusOnlineID]:
     """Fetch to import ids."""
-    ids = []
-    for theses_filter, state in theses_filters:
-        body = create_request_body_ids(token, theses_filter)
+    body = create_request_body_ids(token, theses_filter)
 
-        headers = create_request_header("getAllThesesMetadataRequest")
-        response = post(endpoint, data=body, headers=headers, timeout=10)
+    headers = create_request_header("getAllThesesMetadataRequest")
+    response = post(endpoint, data=body, headers=headers, timeout=10)
 
-        root = fromstring(response.text)
-        xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-        ids += [(CampusOnlineID(node.text), state) for node in root.iter(xpath)]
+    root = fromstring(response.text)
+    xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
+    ids = [CampusOnlineID(node.text) for node in root.iter(xpath)]
 
     return ids
 
@@ -69,9 +66,9 @@ def import_all_theses_from_campusonline(
     configs: CampusOnlineConfigs,
 ) -> None:
     """Import all theses from campusonline."""
-    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
+    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filter)
 
-    for cms_id, _ in ids:
+    for cms_id in ids:
         try:
             import_from_campusonline(import_func, cms_id, configs)
         except RuntimeError:
@@ -93,13 +90,9 @@ def duplicate_check_campusonline(
     if campusonline_id == "":
         ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
     else:
-        ids = [(campusonline_id, "")]
+        ids = [campusonline_id]
 
-    duplicates = []
-
-    for cms_id, _ in ids:
-        if duplicate_func(cms_id):
-            duplicates.append(cms_id)
+    duplicates = [cms_id for cms_id in ids if duplicate_func(cms_id)]
 
     return duplicates
 

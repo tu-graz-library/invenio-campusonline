@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -14,15 +14,18 @@ from pathlib import Path
 from shutil import copyfileobj
 from xml.etree.ElementTree import Element, fromstring
 
+from flask import Flask
 from requests import get, post
 
 from .types import (
     URL,
+    CampusOnlineConfigs,
     CampusOnlineID,
     CampusOnlineStatus,
     CampusOnlineToken,
     Embargo,
     FilePath,
+    ThesesFilter,
 )
 
 
@@ -118,7 +121,7 @@ def create_request_body_download(
 
 def create_request_body_ids(
     token: CampusOnlineToken,
-    theses_filter: list[Element],
+    theses_filter: ThesesFilter,
 ) -> str:
     """Build request."""
     body = """
@@ -134,7 +137,7 @@ def create_request_body_ids(
     </soapenv:Envelope>
     """
 
-    return body.replace("TOKEN", token).replace("FILTER", "\n".join(theses_filter))
+    return body.replace("TOKEN", token).replace("FILTER", str(theses_filter))
 
 
 def create_request_header(service: str) -> dict:
@@ -217,3 +220,22 @@ def download_file(
     file_path = f"/tmp/{campusonline_id}.pdf"  # noqa: S108
     store_file_temporarily(file_url, file_path)
     return file_path
+
+
+def config_variables(app: Flask) -> CampusOnlineConfigs:
+    """Configure variables."""
+    endpoint = app.config["CAMPUSONLINE_ENDPOINT"]
+    token = app.config["CAMPUSONLINE_TOKEN"]
+    user_email = app.config["CAMPUSONLINE_USER_EMAIL"]
+    theses_filters = app.config["CAMPUSONLINE_THESES_FILTER"]
+    recipients = app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
+    sender = app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
+
+    return CampusOnlineConfigs(
+        endpoint,
+        token,
+        user_email,
+        theses_filters,
+        recipients,
+        sender,
+    )

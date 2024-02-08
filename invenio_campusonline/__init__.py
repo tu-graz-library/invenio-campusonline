@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021-2023 Graz University of Technology.
+# Copyright (C) 2021-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -10,7 +10,7 @@
 
 from .api import fetch_all_ids, import_from_campusonline
 from .ext import InvenioCampusonline
-from .types import ThesesFilter, ThesesState
+from .types import ThesesFilter
 
 __version__ = "0.3.0"
 
@@ -20,5 +20,4 @@ __all__ = (
     "import_from_campusonline",
     "fetch_all_ids",
     "ThesesFilter",
-    "ThesesState",
 )
