@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021-2023 Graz University of Technology.
+# Copyright (C) 2021-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -23,7 +23,7 @@ CAMPUSONLINE_ERROR_MAIL_SENDER = ""
 CAMPUSONLINE_ERROR_MAIL_RECIPIENTS = []
 """This is the email adress to send error messages to be fixed in the repository."""
 
-CAMPUSONLINE_THESES_FILTERS = []
+CAMPUSONLINE_THESES_FILTER = []
 """This filter provides the possibiliy to set filters for the fetched theses."""
 
 

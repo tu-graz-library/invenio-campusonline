@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -9,10 +9,8 @@
 
 """Types."""
 
-from dataclasses import astuple, dataclass
+from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
-from xml.etree.ElementTree import Element
 
 URL = str
 """Type to indicate that an URL is necessary."""
@@ -32,7 +30,7 @@ It will not have a special schema.
 CampusOnlineStatus = str
 """Type to indicate the status of the record in the campus online system.
 
-The value could be either ARCHIVED or PUBLISHED.
+The value could be either ARCH (archived) or PUB (published).
 """
 
 FilePath = str
@@ -74,23 +72,15 @@ class Color:
     alternate = ("blue", "cyan")
 
 
-class ThesesState(Enum):
-    """Theses State class."""
-
-    LOCKED = 1
-    OPEN = 2
-
-
 @dataclass
 class ThesesFilter:
     """Filter dataclass."""
 
-    filter_: list[Element]
-    state: ThesesState
+    filter_: str
 
-    def __iter__(self):  # noqa: ANN204
-        """Make the class iteratable."""
-        return iter(astuple(self))
+    def __str__(self) -> str:
+        """Convert to string."""
+        return self.filter_
 
 
 @dataclass
@@ -100,6 +90,6 @@ class CampusOnlineConfigs:
     endpoint: URL
     token: CampusOnlineToken
     user_email: EmailAddress
-    theses_filters: ThesesFilter
+    theses_filter: ThesesFilter
     recipients: list[EmailAddress]
     sender: EmailAddress

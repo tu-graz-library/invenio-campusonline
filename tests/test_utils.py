@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -73,43 +73,40 @@ def test_create_request_body_download() -> None:
 
 def test_create_request_body_ids() -> None:
     """Test the create_request_body_ids function."""
-    body = create_request_body_ids("abcd", [])
-    expected = """
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getAllThesesMetadataRequest>
-          <bas:token>abcd</bas:token>
-          FILTER
-        </bas:getAllThesesMetadataRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
-    """.replace(
-        "FILTER",
-        "\n".join([]),
-    )
-    assert body == expected
+    body = create_request_body_ids("abcd", "")
 
-    theses_filter = [
-        """<bas:thesesType>DISS</bas:thesesType>""",
-        """<bas:state name="IFG"/>""",
-    ]
-    body = create_request_body_ids("abcd", theses_filter)
-    expected = """
+    FILTER = ""  # noqa: N806
+    expected = f"""
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                       xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
       <soapenv:Header/>
       <soapenv:Body>
         <bas:getAllThesesMetadataRequest>
           <bas:token>abcd</bas:token>
-          <bas:thesesType>DISS</bas:thesesType>
-<bas:state name="IFG"/>
+          {FILTER}
         </bas:getAllThesesMetadataRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
+    assert body == expected
 
+    FILTER = """
+        <bas:thesesType>DISS</bas:thesesType>
+        <bas:state name="IFG"/>
+    """  # noqa: N806
+    body = create_request_body_ids("abcd", FILTER)
+    expected = f"""
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+      <soapenv:Header/>
+      <soapenv:Body>
+        <bas:getAllThesesMetadataRequest>
+          <bas:token>abcd</bas:token>
+          {FILTER}
+        </bas:getAllThesesMetadataRequest>
+      </soapenv:Body>
+    </soapenv:Envelope>
+    """
     assert body == expected
 
 
