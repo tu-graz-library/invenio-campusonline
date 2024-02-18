@@ -33,79 +33,78 @@ from .utils import (
     get_metadata,
 )
 
-
-def import_from_campusonline(
-    import_func: Callable,
-    cms_id: CampusOnlineID,
-    configs: CampusOnlineConfigs,
-) -> RecordItem:
-    """Import record from campusonline."""
-    return import_func(cms_id, configs, get_metadata, download_file)
-
-
-def fetch_all_ids(
-    endpoint: URL,
-    token: CampusOnlineToken,
-    theses_filter: ThesesFilter = None,
-) -> list[CampusOnlineID]:
-    """Fetch to import ids."""
-    body = create_request_body_ids(token, theses_filter)
-
-    headers = create_request_header("getAllThesesMetadataRequest")
-    response = post(endpoint, data=body, headers=headers, timeout=10)
-
-    root = fromstring(response.text)
-    xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
-    ids = [CampusOnlineID(node.text) for node in root.iter(xpath)]
-
-    return ids
+# def import_from_campusonline(
+#     import_func: Callable,
+#     cms_id: CampusOnlineID,
+#     configs: CampusOnlineConfigs,
+# ) -> RecordItem:
+#     """Import record from campusonline."""
+#     return import_func(cms_id, configs, get_metadata, download_file)
 
 
-def import_all_theses_from_campusonline(
-    import_func: Callable,
-    configs: CampusOnlineConfigs,
-) -> None:
-    """Import all theses from campusonline."""
-    ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filter)
+# def fetch_all_ids(
+#     endpoint: URL,
+#     token: CampusOnlineToken,
+#     theses_filter: ThesesFilter = None,
+# ) -> list[CampusOnlineID]:
+#     """Fetch to import ids."""
+#     body = create_request_body_ids(token, theses_filter)
 
-    for cms_id in ids:
-        try:
-            import_from_campusonline(import_func, cms_id, configs)
-        except RuntimeError:
-            msg = Message(
-                "ERROR: importing from campusonline",
-                sender=configs.sender,
-                recipients=configs.recipients,
-                body=f"thesis id: {cms_id}",
-            )
-            current_app.extensions["mail"].send(msg)
+#     headers = create_request_header("getAllThesesMetadataRequest")
+#     response = post(endpoint, data=body, headers=headers, timeout=10)
+
+#     root = fromstring(response.text)
+#     xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
+#     ids = [CampusOnlineID(node.text) for node in root.iter(xpath)]
+
+#     return ids
 
 
-def duplicate_check_campusonline(
-    duplicate_func: Callable,
-    configs: CampusOnlineConfigs,
-    campusonline_id: str,
-) -> list:
-    """Duplicate check campusonline."""
-    if campusonline_id == "":
-        ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
-    else:
-        ids = [campusonline_id]
+# def import_all_theses_from_campusonline(
+#     import_func: Callable,
+#     configs: CampusOnlineConfigs,
+# ) -> None:
+#     """Import all theses from campusonline."""
+#     ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filter)
 
-    duplicates = [cms_id for cms_id in ids if duplicate_func(cms_id)]
+#     for cms_id in ids:
+#         try:
+#             import_from_campusonline(import_func, cms_id, configs)
+#         except RuntimeError:
+#             msg = Message(
+#                 "ERROR: importing from campusonline",
+#                 sender=configs.sender,
+#                 recipients=configs.recipients,
+#                 body=f"thesis id: {cms_id}",
+#             )
+#             current_app.extensions["mail"].send(msg)
 
-    return duplicates
+
+# def duplicate_check_campusonline(
+#     duplicate_func: Callable,
+#     configs: CampusOnlineConfigs,
+#     campusonline_id: str,
+# ) -> list:
+#     """Duplicate check campusonline."""
+#     if campusonline_id == "":
+#         ids = fetch_all_ids(configs.endpoint, configs.token, configs.theses_filters)
+#     else:
+#         ids = [campusonline_id]
+
+#     duplicates = [cms_id for cms_id in ids if duplicate_func(cms_id)]
+
+#     return duplicates
 
 
-def set_status(
-    endpoint: URL,
-    token: CampusOnlineToken,
-    cms_id: CampusOnlineID,
-    status: CampusOnlineStatus,
-    date: Date,
-) -> str:
-    """Set status."""
-    body = create_request_body_status(token, cms_id, status, date)
-    headers = create_request_header("setThesisStatusByIDRequest")
-    response = post(endpoint, data=body, headers=headers, timeout=10)
-    return fromstring(response.text)
+# def set_status(
+#     endpoint: URL,
+#     token: CampusOnlineToken,
+#     cms_id: CampusOnlineID,
+#     status: CampusOnlineStatus,
+#     date: Date,
+# ) -> str:
+#     """Set status."""
+#     body = create_request_body_status(token, cms_id, status, date)
+#     headers = create_request_header("setThesisStatusByIDRequest")
+#     response = post(endpoint, data=body, headers=headers, timeout=10)
+#     return fromstring(response.text)
