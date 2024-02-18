@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -11,18 +11,14 @@
 from datetime import date as Date
 
 from click import STRING, Choice, DateTime, group, option, secho
-from click_params import URL
+from click_params.domain import UrlParamType
 from flask import current_app
 from flask.cli import with_appcontext
+from invenio_access.permissions import system_identity
+from invenio_config_tugraz import get_identity_from_user_by_email
 
-from .api import (
-    duplicate_check_campusonline,
-    fetch_all_ids,
-    import_all_theses_from_campusonline,
-    import_from_campusonline,
-    set_status,
-)
-from .types import CampusOnlineConfigs, Color
+from .services import CampusOnlineRESTService, build_services
+from .types import Color
 from .utils import as_date
 
 
@@ -33,33 +29,22 @@ def campusonline() -> None:
 
 @campusonline.command()
 @with_appcontext
-@option("--endpoint", type=URL)
-@option("--campusonline-id", type=STRING)
-@option("--token", type=STRING)
-@option("--user-email", type=STRING, default="cms@tugraz.at")
+@option("--endpoint", type=UrlParamType(may_have_port=True), required=True)
+@option("--token", type=STRING, required=True)
+@option("--campusonline-id", type=STRING, required=True)
+@option("--user-email", type=STRING, required=True)
 @option("--no-color", is_flag=True, default=False)
+@build_services
 def import_thesis(
-    endpoint: str,
+    cms_service: CampusOnlineRESTService,
     campusonline_id: str,
-    token: str,
     user_email: str,
     no_color: bool,  # noqa: FBT001
 ) -> None:
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
-    recipients = current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
-    sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
-
-    configs = CampusOnlineConfigs(
-        endpoint,
-        token,
-        user_email,
-        theses_filters,
-        recipients,
-        sender,
-    )
-    record = import_from_campusonline(import_func, campusonline_id, configs)
+    identity = get_identity_from_user_by_email(email=user_email)
+    record = import_func(campusonline_id, identity, cms_service)
 
     color = Color.success if not no_color else Color.neutral
     secho(f"record.id: {record.id}", fg=color)
@@ -67,17 +52,17 @@ def import_thesis(
 
 @campusonline.command()
 @with_appcontext
-@option("--endpoint", type=URL)
-@option("--token", type=STRING)
+@option("--endpoint", type=UrlParamType(may_have_port=True), required=True)
+@option("--token", type=STRING, required=True)
 @option("--no-color", is_flag=True, default=False)
+@build_services
 def fetch_ids(
-    endpoint: str,
-    token: str,
+    cms_service: CampusOnlineRESTService,
     no_color: bool,  # noqa: FBT001
 ) -> None:
     """Fetch all to import ids."""
-    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
-    ids = fetch_all_ids(endpoint, token, theses_filters)
+    theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
+    ids = cms_service.fetch_all_ids(system_identity, theses_filter)
 
     color = Color.success if not no_color else Color.neutral
     secho(f"ids: {ids}", fg=color)
@@ -85,46 +70,42 @@ def fetch_ids(
 
 @campusonline.command()
 @with_appcontext
-@option("--endpoint", type=URL)
+@option("--endpoint", type=UrlParamType(may_have_port=True))
 @option("--token", type=STRING)
 @option("--user-email", type=STRING, default="cms@tugraz.at")
-def full_sync(endpoint: str, token: str, user_email: str) -> None:
+def full_sync(cms_service: CampusOnlineRESTService, user_email: str) -> None:
     """Full sync."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
-    recipients = current_app.config["CAMPUSONLINE_ERROR_MAIL_RECIPIENTS"]
-    sender = current_app.config["CAMPUSONLINE_ERROR_MAIL_SENDER"]
+    theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
-    configs = CampusOnlineConfigs(
-        endpoint,
-        token,
-        user_email,
-        theses_filters,
-        recipients,
-        sender,
-    )
-    import_all_theses_from_campusonline(import_func, configs)
+    identity = get_identity_from_user_by_email(email=user_email)
+    ids = cms_service.fetch_all_ids(theses_filter)
+
+    for cms_id in ids:
+        try:
+            import_func(cms_id, identity, cms_service)
+        except RuntimeError as e:
+            msg = f"ERROR cms_id: {cms_id} couldn't be imported because of {e}"
+            secho(msg, fg=Color.error)
 
 
 @campusonline.command()
 @with_appcontext
-@option("--endpoint", type=URL, required=True)
+@option("--endpoint", type=UrlParamType(may_have_port=True), required=True)
 @option("--token", type=STRING, required=True)
 @option("--campusonline-id", type=STRING, default="")
-def duplicate_check(endpoint: str, token: str, campusonline_id: str) -> None:
+@build_services
+def duplicate_check(cms_service, campusonline_id: str) -> None:
     """Duplicate check."""
     duplicate_func = current_app.config["CAMPUSONLINE_DUPLICATE_FUNC"]
     theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
 
-    configs = CampusOnlineConfigs(
-        endpoint,
-        token,
-        "",
-        theses_filters,
-        [],
-        "",
-    )
-    duplicates = duplicate_check_campusonline(duplicate_func, configs, campusonline_id)
+    if campusonline_id == "":
+        ids = cms_service.fetch_all_ids(theses_filters)
+    else:
+        ids = [campusonline_id]
+
+    duplicates = [cms_id for cms_id in ids if duplicate_func(cms_id)]
 
     for duplicate in duplicates:
         secho(duplicate, fg=Color.neutral)
@@ -133,20 +114,20 @@ def duplicate_check(endpoint: str, token: str, campusonline_id: str) -> None:
 @campusonline.command()
 @with_appcontext
 @option("--campusonline-id", type=STRING)
-@option("--endpoint", type=URL)
+@option("--endpoint", type=UrlParamType(may_have_port=True))
 @option("--token", type=STRING)
 @option("--status", type=Choice(["ARCHIVED", "PUBLISHED"], case_sensitive=True))
 @option("--date", type=DateTime(["%Y-%m-%d"]), callback=as_date)
 @option("--no-color", is_flag=True, default=False)
+@build_services
 def update_status(
+    cms_service,
     campusonline_id: str,
-    endpoint: str,
-    token: str,
     status: str,
     date: Date,
     no_color: bool,  # noqa: FBT001
 ) -> None:
     """Update status."""
-    response = set_status(endpoint, token, campusonline_id, status, date)
+    response = cms_service.set_status(campusonline_id, status, date)
     color = Color.success if not no_color else Color.neutral
     secho(f"response: {response}", fg=color)

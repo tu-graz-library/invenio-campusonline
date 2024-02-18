@@ -12,14 +12,27 @@
 
 from celery import shared_task
 from flask import current_app
+from invenio_access.permissions import system_identity
 
-from .api import import_all_theses_from_campusonline
-from .utils import config_variables
+from .proxies import current_campusonline
 
 
 @shared_task(ignore_result=True)
 def import_theses_from_campusonline() -> None:
     """Import theses from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    configs = config_variables()
-    import_all_theses_from_campusonline(import_func, configs)
+    theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
+
+    cms_service = current_campusonline.cms_rest_service
+    ids = cms_service.fetch_all_ids(theses_filter)
+
+    for cms_id in ids:
+        try:
+            import_func(cms_id, system_identity, cms_service)
+        except RuntimeError as e:
+            msg = "ERROR campusonline cms_id: %s couldn't be imported because of %s"
+            current_app.logger.error(
+                msg,
+                cms_id,
+                str(e),
+            )

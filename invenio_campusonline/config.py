@@ -17,13 +17,8 @@ CAMPUSONLINE_TOKEN = ""
 CAMPUSONLINE_USER_EMAIL = ""
 """This is the email adress of the campusonline user in the repository."""
 
-CAMPUSONLINE_ERROR_MAIL_SENDER = ""
-"""This is the error mail sender."""
 
-CAMPUSONLINE_ERROR_MAIL_RECIPIENTS = []
-"""This is the email adress to send error messages to be fixed in the repository."""
-
-CAMPUSONLINE_THESES_FILTER = []
+CAMPUSONLINE_THESES_FILTER = None
 """This filter provides the possibiliy to set filters for the fetched theses."""
 
 
