@@ -18,7 +18,7 @@ from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
 
-from ..records import CampusOnlineRecord
+from ..records import CampusOnlineAPI
 from ..types import CampusOnlineID, CampusOnlineStatus, Embargo, ThesesFilter
 from .config import CampusOnlineRESTServiceConfig
 
@@ -42,27 +42,27 @@ def build_services(f: Callable) -> Callable:
 class CampusOnlineRESTService:
     """Campusonline REST service."""
 
-    record_cls = CampusOnlineRecord
+    api_cls = CampusOnlineAPI
 
     def __init__(self, config: CampusOnlineRESTServiceConfig) -> None:
         """Construct."""
         self._config = config
-        self.record = CampusOnlineRecord(config)
+        self.api = self.api_cls(config=config)
 
     def fetch_all_ids(self, identity: Identity, theses_filter: ThesesFilter):
         """Fetch all ids."""
         # self.require_permission()
-        return self.record.fetch_ids(theses_filter)
+        return self.api.fetch_ids(theses_filter)
 
     def download_file(self, identity: Identity, cms_id: CampusOnlineID):
         """Download file."""
         # self.require_permission()
-        return self.record.download_file(cms_id)
+        return self.api.download_file(cms_id)
 
     def get_metadata(self, identity: Identity, cms_id: CampusOnlineID):
         """Get metadata."""
         # self.require_permission()
-        return self.record.get_metadata(cms_id)
+        return self.api.get_metadata(cms_id)
 
     def set_status(
         self,
@@ -73,4 +73,4 @@ class CampusOnlineRESTService:
     ):
         """Set Status."""
         # self.require_permission()
-        self.model.set_status(cms_id, status, date)
+        self.api.set_status(cms_id, status, date)

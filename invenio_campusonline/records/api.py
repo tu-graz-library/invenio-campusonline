@@ -13,7 +13,7 @@ from xml.etree.ElementTree import Element
 
 from ..services import CampusOnlineRESTServiceConfig
 from ..types import CampusOnlineID, CampusOnlineStatus, FilePath, ThesesFilter
-from .models import CampusOnlineMetadata
+from .models import CampusOnlineConnection
 
 
 def exists_fulltext(thesis: Element) -> bool:
@@ -24,23 +24,23 @@ def exists_fulltext(thesis: Element) -> bool:
     return ele is not None
 
 
-class CampusOnlineRecord:
+class CampusOnlineAPI:
     """Campus online record."""
 
-    model_cls = CampusOnlineMetadata
+    connection_cls = CampusOnlineConnection
 
     def __init__(self, config: CampusOnlineRESTServiceConfig):
-        self.model = self.model_cls(config)
+        self.connection = self.connection_cls(config)
 
     def fetch_ids(self, theses_filter: ThesesFilter) -> list:
         """Fetch ids."""
-        root = self.model.post_ids(theses_filter)
+        root = self.connection.post_ids(theses_filter)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
         return [CampusOnlineID(node.text) for node in root.iter(xpath)]
 
     def get_file_url(self, campusonline_id: CampusOnlineID) -> str:
         """Get file URL."""
-        root = self.model.post_file_url(campusonline_id)
+        root = self.connection.post_file_url(campusonline_id)
 
         if not exists_fulltext(root):
             msg = f"record ({campusonline_id}) has no associated file"
@@ -53,7 +53,7 @@ class CampusOnlineRecord:
 
     def get_metadata(self, campusonline_id: CampusOnlineID) -> Element:
         """Get Metadata."""
-        root = self.model.post_metadata(campusonline_id)
+        root = self.connection.post_metadata(campusonline_id)
 
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
         return next(root.iter(xpath))
@@ -63,7 +63,7 @@ class CampusOnlineRecord:
         file_url = self.get_file_url(campusonline_id)
 
         file_path = f"/tmp/{campusonline_id}.pdf"  # noqa: S108
-        self.model.store_file_temporarily(file_url, file_path)
+        self.connection.store_file_temporarily(file_url, file_path)
         return file_path
 
     def set_status(
@@ -73,4 +73,11 @@ class CampusOnlineRecord:
         date: Date,
     ):
         """Set status."""
-        return self.model.post_status(cms_id, status, date)
+        root = self.connection.post_status(cms_id, status, date)
+        xpath = "{http://www.campusonline.at/thesisservice/basetypes}errorMessage"
+        ele = root.find(xpath)
+        if ele is not None:
+            error_message = ele.text
+            msg = f"Set status on {cms_id} went wrong with {error_message}"
+            raise RuntimeError(msg)
+        return True
