@@ -37,46 +37,47 @@ class CampusOnlineRESTPOSTXML:
     ) -> str:
         """Create request body status."""
         body = f"""
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-        <soapenv:Header/>
-        <soapenv:Body>
-        <bas:setThesisStatusByIDRequest>
-        <bas:token>{self.token}</bas:token>
-        <bas:ID>{campusonline_id}</bas:ID>
-          <bas:status>{status}</bas:status>
-          <bas:statusDate>{date}</bas:statusDate>
-        </bas:setThesisStatusByIDRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:setThesisStatusByIDRequest>
+              <bas:token>{self.token}</bas:token>
+              <bas:ID>{campusonline_id}</bas:ID>
+              <bas:status>{status}</bas:status>
+              <bas:statusDate>{date}</bas:statusDate>
+            </bas:setThesisStatusByIDRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
         """
         return body
 
     def create_request_body_metadata(self, campusonline_id: CampusOnlineID) -> str:
         """Build Request."""
         body = f"""
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getMetadataByThesisIDRequest>
-          <bas:token>{self.token}</bas:token>
-          <bas:ID>{campusonline_id}</bas:ID>
-          <bas:attr key="ALL"/>
-          <bas:classAttrKeySet>
-            <bas:name>text</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-          <bas:classAttrKeySet>
-            <bas:name>author</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-          <bas:classAttrKeySet>
-            <bas:name>supervisor</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-        </bas:getMetadataByThesisIDRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getMetadataByThesisIDRequest>
+              <bas:token>{self.token}</bas:token>
+              <bas:ID>{campusonline_id}</bas:ID>
+              <bas:attr key="ALL"/>
+              <bas:classAttrKeySet>
+                <bas:name>text</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+              <bas:classAttrKeySet>
+                <bas:name>author</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+              <bas:classAttrKeySet>
+                <bas:name>supervisor</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+            </bas:getMetadataByThesisIDRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
         """
 
         return body
@@ -84,17 +85,17 @@ class CampusOnlineRESTPOSTXML:
     def create_request_body_download(self, campusonline_id: CampusOnlineID) -> str:
         """Build Request."""
         body = f"""
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getDocumentByThesisIDRequest>
-          <bas:token>{self.token}</bas:token>
-          <bas:ID>{campusonline_id}</bas:ID>
-          <bas:docType>VOLLTEXT</bas:docType>
-        </bas:getDocumentByThesisIDRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getDocumentByThesisIDRequest>
+              <bas:token>{self.token}</bas:token>
+              <bas:ID>{campusonline_id}</bas:ID>
+              <bas:docType>VOLLTEXT</bas:docType>
+            </bas:getDocumentByThesisIDRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
         """
 
         return body
@@ -105,16 +106,16 @@ class CampusOnlineRESTPOSTXML:
     ) -> str:
         """Build request."""
         body = f"""
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getAllThesesMetadataRequest>
-          <bas:token>{self.token}</bas:token>
-          {str(theses_filter)}
-        </bas:getAllThesesMetadataRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getAllThesesMetadataRequest>
+              <bas:token>{self.token}</bas:token>
+              {str(theses_filter)}
+            </bas:getAllThesesMetadataRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
         """
 
         return body
@@ -128,7 +129,7 @@ class CampusOnlineRESTPOSTXML:
         }
 
 
-class CampusOnlineMetadata:
+class CampusOnlineConnection:
     def __init__(self, config):
         self.config = config
         self.post_xml = CampusOnlineRESTPOSTXML(self.config.token)

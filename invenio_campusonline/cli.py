@@ -116,8 +116,9 @@ def duplicate_check(cms_service, campusonline_id: str) -> None:
 @option("--campusonline-id", type=STRING)
 @option("--endpoint", type=UrlParamType(may_have_port=True))
 @option("--token", type=STRING)
-@option("--status", type=Choice(["ARCHIVED", "PUBLISHED"], case_sensitive=True))
+@option("--status", type=Choice(["ARCH", "PUB"], case_sensitive=True))
 @option("--date", type=DateTime(["%Y-%m-%d"]), callback=as_date)
+@option("--user-email", type=STRING, default="cms@tugraz.at")
 @option("--no-color", is_flag=True, default=False)
 @build_services
 def update_status(
@@ -125,9 +126,11 @@ def update_status(
     campusonline_id: str,
     status: str,
     date: Date,
+    user_email: str,
     no_color: bool,  # noqa: FBT001
 ) -> None:
     """Update status."""
-    response = cms_service.set_status(campusonline_id, status, date)
+    identity = get_identity_from_user_by_email(email=user_email)
+    response = cms_service.set_status(identity, campusonline_id, status, date)
     color = Color.success if not no_color else Color.neutral
     secho(f"response: {response}", fg=color)

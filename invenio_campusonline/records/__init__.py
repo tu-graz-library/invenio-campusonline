@@ -8,10 +8,10 @@
 
 """Records."""
 
-from .api import CampusOnlineRecord
-from .models import CampusOnlineMetadata
+from .api import CampusOnlineAPI
+from .models import CampusOnlineConnection
 
 __all__ = (
-    "CampusOnlineMetadata",
-    "CampusOnlineRecord",
+    "CampusOnlineConnection",
+    "CampusOnlineAPI",
 )
