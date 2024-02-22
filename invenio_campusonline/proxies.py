@@ -12,6 +12,6 @@ from flask import current_app
 from werkzeug.local import LocalProxy
 
 current_campusonline = LocalProxy(
-    lambda: current_app.extensions["invenio-campusonline"]
+    lambda: current_app.extensions["invenio-campusonline"],
 )
 """Helper proxy to get teh current campusonline extension."""

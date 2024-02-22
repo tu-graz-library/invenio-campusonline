@@ -11,7 +11,7 @@
 from datetime import date as Date
 from pathlib import Path
 from shutil import copyfileobj
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import Element, fromstring
 
 from requests import ReadTimeout, get, post
 
@@ -23,6 +23,7 @@ from ..types import (
     FilePath,
     ThesesFilter,
 )
+from .config import CampusOnlineRESTConfig
 
 
 class CampusOnlineRESTError(Exception):
@@ -34,7 +35,10 @@ class CampusOnlineRESTError(Exception):
 
 
 class CampusOnlineRESTPOSTXML:
-    def __init__(self, token: CampusOnlineToken):
+    """Campusonline rest post xml."""
+
+    def __init__(self, token: CampusOnlineToken) -> None:
+        """Construct."""
         self.token = token
 
     def create_request_body_status(
@@ -120,7 +124,7 @@ class CampusOnlineRESTPOSTXML:
           <soapenv:Body>
             <bas:getAllThesesMetadataRequest>
               <bas:token>{self.token}</bas:token>
-              {str(theses_filter)}
+              {theses_filter}
             </bas:getAllThesesMetadataRequest>
           </soapenv:Body>
         </soapenv:Envelope>
@@ -138,34 +142,40 @@ class CampusOnlineRESTPOSTXML:
 
 
 class CampusOnlineConnection:
-    def __init__(self, config):
+    """Campusonline connection."""
+
+    def __init__(self, config: CampusOnlineRESTConfig) -> None:
+        """Construct."""
         self.config = config
         self.post_xml = CampusOnlineRESTPOSTXML(self.config.token)
 
-    def post(self, data, headers):
+    def post(self, data: str, headers: dict[str, str]) -> Element:
         """Post."""
         try:
             response = post(
-                self.config.endpoint, data=data, headers=headers, timeout=10
+                self.config.endpoint,
+                data=data,
+                headers=headers,
+                timeout=10,
             )
         except ReadTimeout as exc:
-            raise CampusOnlineRESTError(code=550, msg=str(exc))
+            raise CampusOnlineRESTError(code=550, msg=str(exc)) from exc
 
         return fromstring(response.text)
 
-    def post_ids(self, theses_filter):
+    def post_ids(self, theses_filter: ThesesFilter) -> Element:
         """Post ids."""
         body = self.post_xml.create_request_body_ids(theses_filter)
         headers = self.post_xml.create_request_header("getAllThesesMetadataRequest")
         return self.post(body, headers)
 
-    def post_file_url(self, campusonline_id):
+    def post_file_url(self, campusonline_id: CampusOnlineID) -> Element:
         """Post file url."""
         body = self.post_xml.create_request_body_download(campusonline_id)
         headers = self.post_xml.create_request_header("getDocumentByThesisID")
         return self.post(body, headers)
 
-    def post_metadata(self, campusonline_id: CampusOnlineID):
+    def post_metadata(self, campusonline_id: CampusOnlineID) -> Element:
         """Post metadata."""
         body = self.post_xml.create_request_body_metadata(campusonline_id)
         headers = self.post_xml.create_request_header("getMetadataByThesisID")
@@ -183,7 +193,7 @@ class CampusOnlineConnection:
         cms_id: CampusOnlineID,
         status: CampusOnlineStatus,
         date: Date,
-    ):
+    ) -> Element:
         """Post status."""
         body = self.post_xml.create_request_body_status(cms_id, status, date)
         headers = self.post_xml.create_request_header("setThesisStatusByIDRequest")

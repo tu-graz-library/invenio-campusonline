@@ -15,7 +15,11 @@ from xml.etree.ElementTree import Element
 from .types import Embargo
 
 
-def as_date(ctx, param, value: datetime) -> Date:
+def as_date(
+    ctx,  # noqa: ANN001, ARG001
+    param,  # noqa: ANN001, ARG001
+    value: datetime,
+) -> Date:
     """As Date."""
     return value.date()
 

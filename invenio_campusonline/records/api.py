@@ -29,10 +29,11 @@ class CampusOnlineAPI:
 
     connection_cls = CampusOnlineConnection
 
-    def __init__(self, config: CampusOnlineRESTConfig):
+    def __init__(self, config: CampusOnlineRESTConfig) -> None:
+        """Construct."""
         self.connection = self.connection_cls(config)
 
-    def fetch_ids(self, theses_filter: ThesesFilter) -> list:
+    def fetch_ids(self, theses_filter: ThesesFilter) -> list[CampusOnlineID]:
         """Fetch ids."""
         root = self.connection.post_ids(theses_filter)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}ID"
@@ -71,7 +72,7 @@ class CampusOnlineAPI:
         cms_id: CampusOnlineID,
         status: CampusOnlineStatus,
         date: Date,
-    ):
+    ) -> bool:
         """Set status."""
         root = self.connection.post_status(cms_id, status, date)
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}errorMessage"
