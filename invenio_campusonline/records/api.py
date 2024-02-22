@@ -11,8 +11,8 @@
 from datetime import date as Date
 from xml.etree.ElementTree import Element
 
-from ..services import CampusOnlineRESTServiceConfig
 from ..types import CampusOnlineID, CampusOnlineStatus, FilePath, ThesesFilter
+from .config import CampusOnlineRESTConfig
 from .models import CampusOnlineConnection
 
 
@@ -29,7 +29,7 @@ class CampusOnlineAPI:
 
     connection_cls = CampusOnlineConnection
 
-    def __init__(self, config: CampusOnlineRESTServiceConfig):
+    def __init__(self, config: CampusOnlineRESTConfig):
         self.connection = self.connection_cls(config)
 
     def fetch_ids(self, theses_filter: ThesesFilter) -> list:

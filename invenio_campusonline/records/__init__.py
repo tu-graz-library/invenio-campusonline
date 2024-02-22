@@ -9,9 +9,11 @@
 """Records."""
 
 from .api import CampusOnlineAPI
+from .config import CampusOnlineRESTConfig
 from .models import CampusOnlineConnection
 
 __all__ = (
-    "CampusOnlineConnection",
     "CampusOnlineAPI",
+    "CampusOnlineConnection",
+    "CampusOnlineRESTConfig",
 )

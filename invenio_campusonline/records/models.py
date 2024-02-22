@@ -13,7 +13,7 @@ from pathlib import Path
 from shutil import copyfileobj
 from xml.etree.ElementTree import fromstring
 
-from requests import get, post
+from requests import ReadTimeout, get, post
 
 from ..types import (
     URL,
@@ -23,6 +23,14 @@ from ..types import (
     FilePath,
     ThesesFilter,
 )
+
+
+class CampusOnlineRESTError(Exception):
+    """Alma Rest API error class."""
+
+    def __init__(self, code: int, msg: str) -> None:
+        """Create alma rest error."""
+        super().__init__(f"CampusOnline REST error code={code} msg='{msg}'")
 
 
 class CampusOnlineRESTPOSTXML:
@@ -134,26 +142,34 @@ class CampusOnlineConnection:
         self.config = config
         self.post_xml = CampusOnlineRESTPOSTXML(self.config.token)
 
+    def post(self, data, headers):
+        """Post."""
+        try:
+            response = post(
+                self.config.endpoint, data=data, headers=headers, timeout=10
+            )
+        except ReadTimeout as exc:
+            raise CampusOnlineRESTError(code=550, msg=str(exc))
+
+        return fromstring(response.text)
+
     def post_ids(self, theses_filter):
+        """Post ids."""
         body = self.post_xml.create_request_body_ids(theses_filter)
         headers = self.post_xml.create_request_header("getAllThesesMetadataRequest")
-        response = post(self.config.endpoint, data=body, headers=headers, timeout=10)
-
-        return fromstring(response.text)
+        return self.post(body, headers)
 
     def post_file_url(self, campusonline_id):
+        """Post file url."""
         body = self.post_xml.create_request_body_download(campusonline_id)
         headers = self.post_xml.create_request_header("getDocumentByThesisID")
-        response = post(self.config.endpoint, data=body, headers=headers, timeout=10)
-
-        return fromstring(response.text)
+        return self.post(body, headers)
 
     def post_metadata(self, campusonline_id: CampusOnlineID):
+        """Post metadata."""
         body = self.post_xml.create_request_body_metadata(campusonline_id)
         headers = self.post_xml.create_request_header("getMetadataByThesisID")
-        response = post(self.config.endpoint, data=body, headers=headers, timeout=10)
-
-        return fromstring(response.text)
+        return self.post(body, headers)
 
     def store_file_temporarily(self, file_url: URL, file_path: FilePath) -> None:
         """Store the file referenced by url to the local file path."""
@@ -171,5 +187,4 @@ class CampusOnlineConnection:
         """Post status."""
         body = self.post_xml.create_request_body_status(cms_id, status, date)
         headers = self.post_xml.create_request_header("setThesisStatusByIDRequest")
-        response = post(self.config.endpoint, data=body, headers=headers, timeout=10)
-        return fromstring(response.text)
+        return self.post(body, headers)

@@ -9,45 +9,27 @@
 """Services."""
 
 
-from collections.abc import Callable
 from datetime import date as Date
-from datetime import datetime
-from functools import wraps
-from typing import Any
-from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
 
 from ..records import CampusOnlineAPI
-from ..types import CampusOnlineID, CampusOnlineStatus, Embargo, ThesesFilter
+from ..types import CampusOnlineID, CampusOnlineStatus, ThesesFilter
 from .config import CampusOnlineRESTServiceConfig
-
-
-def build_services(f: Callable) -> Callable:
-    """Decorate to build the services."""
-
-    @wraps(f)
-    def build(*_: dict, **kwargs: dict) -> Any:  # noqa: ANN401
-        endpoint = kwargs.pop("endpoint")
-        token = kwargs.pop("token")
-
-        config = CampusOnlineRESTServiceConfig(endpoint, token)
-        kwargs["cms_service"] = CampusOnlineRESTService(config)
-
-        return f(**kwargs)
-
-    return build
 
 
 class CampusOnlineRESTService:
     """Campusonline REST service."""
 
-    api_cls = CampusOnlineAPI
-
     def __init__(self, config: CampusOnlineRESTServiceConfig) -> None:
         """Construct."""
         self._config = config
         self.api = self.api_cls(config=config)
+
+    @property
+    def api_cls(self) -> CampusOnlineAPI:
+        """Get api cls."""
+        return self._config.api_cls
 
     def fetch_all_ids(self, identity: Identity, theses_filter: ThesesFilter):
         """Fetch all ids."""
