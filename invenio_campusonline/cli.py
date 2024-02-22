@@ -44,7 +44,7 @@ def import_thesis(
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     identity = get_identity_from_user_by_email(email=user_email)
-    record = import_func(campusonline_id, identity, cms_service)
+    record = import_func(identity, campusonline_id, cms_service)
 
     color = Color.success if not no_color else Color.neutral
     secho(f"record.id: {record.id}", fg=color)
@@ -83,7 +83,7 @@ def full_sync(cms_service: CampusOnlineRESTService, user_email: str) -> None:
 
     for cms_id in ids:
         try:
-            import_func(cms_id, identity, cms_service)
+            import_func(identity, cms_id, cms_service)
         except RuntimeError as e:
             msg = f"ERROR cms_id: {cms_id} couldn't be imported because of {e}"
             secho(msg, fg=Color.error)

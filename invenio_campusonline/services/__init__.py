@@ -9,7 +9,8 @@
 """Services."""
 
 from .config import CampusOnlineRESTServiceConfig
-from .services import CampusOnlineRESTService, build_services
+from .decorators import build_services
+from .services import CampusOnlineRESTService
 
 __all__ = (
     "CampusOnlineRESTService",
