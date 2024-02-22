@@ -8,29 +8,30 @@
 
 """Module utils."""
 
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, fromstring, tostring
 
-from invenio_campusonline.types import Embargo
-from invenio_campusonline.utils import (
-    create_request_body_download,
-    create_request_body_ids,
-    create_request_body_metadata,
-    create_request_header,
-    get_embargo_range,
-)
+from invenio_campusonline.records.models import CampusOnlineRESTPOSTXML
+from invenio_campusonline.types import Embargo, ThesesFilter
+from invenio_campusonline.utils import extract_embargo_range
+
+
+def compare_xml(body: str, expected: str) -> bool:
+    """Compare xml."""
+    return tostring(fromstring(body)) == tostring(fromstring(expected))
 
 
 def test_create_request_body_metadata() -> None:
     """Test the create_request_body_metadata function."""
-    body = create_request_body_metadata("abcd", "efgh")
+    post_xml = CampusOnlineRESTPOSTXML("token-abc")
+    body = post_xml.create_request_body_metadata("abcd")
     expected = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                       xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
       <soapenv:Header/>
       <soapenv:Body>
         <bas:getMetadataByThesisIDRequest>
-          <bas:token>abcd</bas:token>
-          <bas:ID>efgh</bas:ID>
+          <bas:token>token-abc</bas:token>
+          <bas:ID>abcd</bas:ID>
           <bas:attr key="ALL"/>
           <bas:classAttrKeySet>
             <bas:name>text</bas:name>
@@ -49,70 +50,75 @@ def test_create_request_body_metadata() -> None:
     </soapenv:Envelope>
     """
 
-    assert body == expected
+    assert compare_xml(body, expected)
 
 
 def test_create_request_body_download() -> None:
     """Test the create_request_body_download function."""
-    body = create_request_body_download("abcd", "efgh")
+    post_xml = CampusOnlineRESTPOSTXML("token-abc")
+    body = post_xml.create_request_body_download("abcd")
     expected = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
       <soapenv:Header/>
       <soapenv:Body>
         <bas:getDocumentByThesisIDRequest>
-          <bas:token>abcd</bas:token>
-          <bas:ID>efgh</bas:ID>
+          <bas:token>token-abc</bas:token>
+          <bas:ID>abcd</bas:ID>
           <bas:docType>VOLLTEXT</bas:docType>
         </bas:getDocumentByThesisIDRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
-    assert body == expected
+    assert compare_xml(body, expected)
 
 
 def test_create_request_body_ids() -> None:
     """Test the create_request_body_ids function."""
-    body = create_request_body_ids("abcd", "")
+    post_xml = CampusOnlineRESTPOSTXML("token-abc")
+    theses_filter = ThesesFilter("theses-filter-test")
 
-    FILTER = ""  # noqa: N806
+    body = post_xml.create_request_body_ids(theses_filter)
+
     expected = f"""
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                       xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
       <soapenv:Header/>
       <soapenv:Body>
         <bas:getAllThesesMetadataRequest>
-          <bas:token>abcd</bas:token>
-          {FILTER}
+          <bas:token>token-abc</bas:token>
+          {theses_filter}
         </bas:getAllThesesMetadataRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
-    assert body == expected
+    assert compare_xml(body, expected)
 
-    FILTER = """
-        <bas:thesesType>DISS</bas:thesesType>
-        <bas:state name="IFG"/>
-    """  # noqa: N806
-    body = create_request_body_ids("abcd", FILTER)
+    theses_filter = ThesesFilter(
+        """
+            <bas:thesesType>DISS</bas:thesesType>
+            <bas:state name="IFG"/>
+        """,
+    )
+    body = post_xml.create_request_body_ids(theses_filter)
     expected = f"""
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                       xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
       <soapenv:Header/>
       <soapenv:Body>
         <bas:getAllThesesMetadataRequest>
-          <bas:token>abcd</bas:token>
-          {FILTER}
+          <bas:token>token-abc</bas:token>
+          {theses_filter}
         </bas:getAllThesesMetadataRequest>
       </soapenv:Body>
     </soapenv:Envelope>
     """
-    assert body == expected
+    assert compare_xml(body, expected)
 
 
 def test_create_request_header() -> None:
     """Test the create_request_header function."""
-    header = create_request_header("allThesesMetadataRequest")
+    header = CampusOnlineRESTPOSTXML.create_request_header("allThesesMetadataRequest")
     expected = {
         "Content-Type": "application/xml",
         "SOAPAction": "urn:service#allThesesMetadataRequest",
@@ -121,16 +127,16 @@ def test_create_request_header() -> None:
     assert header == expected
 
 
-def test_get_embargo_range(minimal_record: Element) -> None:
-    """Test the get_embargo_range function."""
-    embargo = get_embargo_range(minimal_record)
+def test_extract_embargo_range(minimal_record: Element) -> None:
+    """Test the extract_embargo_range function."""
+    embargo = extract_embargo_range(minimal_record)
 
     assert embargo.end_date == "2025-03-03"
     assert bool(Embargo()) is False
 
-    embargo = get_embargo_range(Element("root"))
+    embargo = extract_embargo_range(Element("root"))
 
     assert bool(embargo) is False
 
-    if not bool(embargo := get_embargo_range(Element("root"))):
+    if not bool(embargo := extract_embargo_range(Element("root"))):
         assert bool(embargo) is False

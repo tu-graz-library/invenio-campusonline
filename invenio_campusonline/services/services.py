@@ -10,11 +10,12 @@
 
 
 from datetime import date as Date
+from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
 
 from ..records import CampusOnlineAPI
-from ..types import CampusOnlineID, CampusOnlineStatus, ThesesFilter
+from ..types import CampusOnlineID, CampusOnlineStatus, FilePath, ThesesFilter
 from .config import CampusOnlineRESTServiceConfig
 
 
@@ -31,28 +32,28 @@ class CampusOnlineRESTService:
         """Get api cls."""
         return self._config.api_cls
 
-    def fetch_all_ids(self, identity: Identity, theses_filter: ThesesFilter):
+    def fetch_all_ids(
+        self,
+        _: Identity,
+        theses_filter: ThesesFilter,
+    ) -> list[CampusOnlineID]:
         """Fetch all ids."""
-        # self.require_permission()
         return self.api.fetch_ids(theses_filter)
 
-    def download_file(self, identity: Identity, cms_id: CampusOnlineID):
+    def download_file(self, _: Identity, cms_id: CampusOnlineID) -> FilePath:
         """Download file."""
-        # self.require_permission()
         return self.api.download_file(cms_id)
 
-    def get_metadata(self, identity: Identity, cms_id: CampusOnlineID):
+    def get_metadata(self, _: Identity, cms_id: CampusOnlineID) -> Element:
         """Get metadata."""
-        # self.require_permission()
         return self.api.get_metadata(cms_id)
 
     def set_status(
         self,
-        identity: Identity,
+        _: Identity,
         cms_id: CampusOnlineID,
         status: CampusOnlineStatus,
         date: Date,
-    ):
+    ) -> bool:
         """Set Status."""
-        # self.require_permission()
         self.api.set_status(cms_id, status, date)

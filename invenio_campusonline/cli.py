@@ -58,7 +58,8 @@ def import_thesis(
 @build_services
 def fetch_ids(
     cms_service: CampusOnlineRESTService,
-    no_color: bool,  # noqa: FBT001
+    *,
+    no_color: bool,
 ) -> None:
     """Fetch all to import ids."""
     theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
@@ -95,7 +96,7 @@ def full_sync(cms_service: CampusOnlineRESTService, user_email: str) -> None:
 @option("--token", type=STRING, required=True)
 @option("--campusonline-id", type=STRING, default="")
 @build_services
-def duplicate_check(cms_service, campusonline_id: str) -> None:
+def duplicate_check(cms_service: CampusOnlineRESTService, campusonline_id: str) -> None:
     """Duplicate check."""
     duplicate_func = current_app.config["CAMPUSONLINE_DUPLICATE_FUNC"]
     theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
@@ -122,12 +123,13 @@ def duplicate_check(cms_service, campusonline_id: str) -> None:
 @option("--no-color", is_flag=True, default=False)
 @build_services
 def update_status(
-    cms_service,
+    cms_service: CampusOnlineRESTService,
     campusonline_id: str,
     status: str,
     date: Date,
     user_email: str,
-    no_color: bool,  # noqa: FBT001
+    *,
+    no_color: bool,
 ) -> None:
     """Update status."""
     identity = get_identity_from_user_by_email(email=user_email)
