@@ -15,7 +15,8 @@ from click_params.domain import UrlParamType
 from flask import current_app
 from flask.cli import with_appcontext
 from invenio_access.permissions import system_identity
-from invenio_config_tugraz import get_identity_from_user_by_email
+from invenio_access.utils import get_identity
+from invenio_accounts import current_accounts
 
 from .services import CampusOnlineRESTService, build_services
 from .types import Color
@@ -43,7 +44,8 @@ def import_thesis(
 ) -> None:
     """Import metadata and file (aka one thesis) from campusonline."""
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
-    identity = get_identity_from_user_by_email(email=user_email)
+    user = current_accounts.datastore.get_user_by_email(user_email)
+    identity = get_identity(user)
     record = import_func(identity, campusonline_id, cms_service)
 
     color = Color.success if not no_color else Color.neutral
@@ -79,7 +81,8 @@ def full_sync(cms_service: CampusOnlineRESTService, user_email: str) -> None:
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
-    identity = get_identity_from_user_by_email(email=user_email)
+    user = current_accounts.datastore.get_user_by_email(user_email)
+    identity = get_identity(user)
     ids = cms_service.fetch_all_ids(theses_filter)
 
     for cms_id in ids:
@@ -132,7 +135,8 @@ def update_status(
     no_color: bool,
 ) -> None:
     """Update status."""
-    identity = get_identity_from_user_by_email(email=user_email)
+    user = current_accounts.datastore.get_user_by_email(user_email)
+    identity = get_identity(user)
     response = cms_service.set_status(identity, campusonline_id, status, date)
     color = Color.success if not no_color else Color.neutral
     secho(f"response: {response}", fg=color)
