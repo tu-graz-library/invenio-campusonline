@@ -8,6 +8,19 @@
 Changes
 =======
 
+Version v0.4.0 (release 2024-02-27)
+
+- setup: remove unused dependency
+- setup: add support for python3.12
+- fix: tests, indentation is a problem
+- fix: missing function
+- setup: move ruff configuration
+- refactor: finalize it of last two commits
+- refactor: follow up of the previous commit
+- refactor: to use service structure
+- types: remove state from ThesisFilter
+
+
 Version v0.3.0 (release 2023-11-03)
 
 - cli: add command duplicate-check
