@@ -25,29 +25,29 @@ def test_create_request_body_metadata() -> None:
     post_xml = CampusOnlineRESTPOSTXML("token-abc")
     body = post_xml.create_request_body_metadata("abcd")
     expected = """
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getMetadataByThesisIDRequest>
-          <bas:token>token-abc</bas:token>
-          <bas:ID>abcd</bas:ID>
-          <bas:attr key="ALL"/>
-          <bas:classAttrKeySet>
-            <bas:name>text</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-          <bas:classAttrKeySet>
-            <bas:name>author</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-          <bas:classAttrKeySet>
-            <bas:name>supervisor</bas:name>
-            <bas:attr key="ALL"/>
-          </bas:classAttrKeySet>
-        </bas:getMetadataByThesisIDRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getMetadataByThesisIDRequest>
+              <bas:token>token-abc</bas:token>
+              <bas:ID>abcd</bas:ID>
+              <bas:attr key="ALL"/>
+              <bas:classAttrKeySet>
+                <bas:name>text</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+              <bas:classAttrKeySet>
+                <bas:name>author</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+              <bas:classAttrKeySet>
+                <bas:name>supervisor</bas:name>
+                <bas:attr key="ALL"/>
+              </bas:classAttrKeySet>
+            </bas:getMetadataByThesisIDRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
     """
 
     assert compare_xml(body, expected)
@@ -58,17 +58,17 @@ def test_create_request_body_download() -> None:
     post_xml = CampusOnlineRESTPOSTXML("token-abc")
     body = post_xml.create_request_body_download("abcd")
     expected = """
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getDocumentByThesisIDRequest>
-          <bas:token>token-abc</bas:token>
-          <bas:ID>abcd</bas:ID>
-          <bas:docType>VOLLTEXT</bas:docType>
-        </bas:getDocumentByThesisIDRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getDocumentByThesisIDRequest>
+              <bas:token>token-abc</bas:token>
+              <bas:ID>abcd</bas:ID>
+              <bas:docType>VOLLTEXT</bas:docType>
+            </bas:getDocumentByThesisIDRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
     """
     assert compare_xml(body, expected)
 
@@ -81,16 +81,16 @@ def test_create_request_body_ids() -> None:
     body = post_xml.create_request_body_ids(theses_filter)
 
     expected = f"""
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getAllThesesMetadataRequest>
-          <bas:token>token-abc</bas:token>
-          {theses_filter}
-        </bas:getAllThesesMetadataRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getAllThesesMetadataRequest>
+              <bas:token>token-abc</bas:token>
+              {theses_filter}
+            </bas:getAllThesesMetadataRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
     """
     assert compare_xml(body, expected)
 
@@ -102,16 +102,16 @@ def test_create_request_body_ids() -> None:
     )
     body = post_xml.create_request_body_ids(theses_filter)
     expected = f"""
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                      xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <bas:getAllThesesMetadataRequest>
-          <bas:token>token-abc</bas:token>
-          {theses_filter}
-        </bas:getAllThesesMetadataRequest>
-      </soapenv:Body>
-    </soapenv:Envelope>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:bas="http://www.campusonline.at/thesisservice/basetypes">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <bas:getAllThesesMetadataRequest>
+              <bas:token>token-abc</bas:token>
+              {theses_filter}
+            </bas:getAllThesesMetadataRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
     """
     assert compare_xml(body, expected)
 
