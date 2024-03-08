@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.4.1 (release 2024-03-08)
+
+- fix: wrong name
+
+
 Version v0.4.0 (release 2024-02-27)
 
 - setup: remove unused dependency
