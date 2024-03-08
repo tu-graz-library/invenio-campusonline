@@ -23,7 +23,7 @@ def import_theses_from_campusonline() -> None:
     import_func = current_app.config["CAMPUSONLINE_IMPORT_FUNC"]
     theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
-    cms_service = current_campusonline.cms_rest_service
+    cms_service = current_campusonline.campusonline_rest_service
     ids = cms_service.fetch_all_ids(theses_filter)
 
     for cms_id in ids:
