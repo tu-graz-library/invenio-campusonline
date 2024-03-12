@@ -27,10 +27,10 @@ from .config import CampusOnlineRESTConfig
 
 
 class CampusOnlineRESTError(Exception):
-    """Alma Rest API error class."""
+    """Campus Online Rest API error class."""
 
     def __init__(self, code: int, msg: str) -> None:
-        """Create alma rest error."""
+        """Create CampusOnline rest error."""
         super().__init__(f"CampusOnline REST error code={code} msg='{msg}'")
 
 
