@@ -24,11 +24,11 @@ def import_theses_from_campusonline() -> None:
     theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
     cms_service = current_campusonline.campusonline_rest_service
-    ids = cms_service.fetch_all_ids(theses_filter)
+    ids = cms_service.fetch_all_ids(system_identity, theses_filter)
 
     for cms_id in ids:
         try:
-            import_func(cms_id, system_identity, cms_service)
+            import_func(system_identity, cms_id, cms_service)
         except RuntimeError as e:
             msg = "ERROR campusonline cms_id: %s couldn't be imported because of %s"
             current_app.logger.error(
