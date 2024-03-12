@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.4.2 (release 2024-03-12)
+
+- fix: parameter ordering
+- fix: copy paste error
+
+
 Version v0.4.1 (release 2024-03-08)
 
 - fix: wrong name
