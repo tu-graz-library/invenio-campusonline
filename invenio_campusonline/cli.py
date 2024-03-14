@@ -117,12 +117,16 @@ def duplicate_check(cms_service: CampusOnlineRESTService, campusonline_id: str) 
 
 @campusonline.command()
 @with_appcontext
-@option("--campusonline-id", type=STRING)
-@option("--endpoint", type=UrlParamType(may_have_port=True))
-@option("--token", type=STRING)
-@option("--status", type=Choice(["ARCH", "PUB"], case_sensitive=True))
-@option("--date", type=DateTime(["%Y-%m-%d"]), callback=as_date)
-@option("--user-email", type=STRING, default="cms@tugraz.at")
+@option("--campusonline-id", type=STRING, required=True)
+@option("--endpoint", type=UrlParamType(may_have_port=True), required=True)
+@option("--token", type=STRING, required=True)
+@option(
+    "--status",
+    type=Choice(["ARCHIVED", "PUBLISHED"], case_sensitive=True),
+    required=True,
+)
+@option("--date", type=DateTime(["%Y-%m-%dT%H:%M:%S"]), callback=as_date, required=True)
+@option("--user-email", type=STRING, default="cms@tugraz.at", required=True)
 @option("--no-color", is_flag=True, default=False)
 @build_services
 def update_status(
@@ -137,6 +141,11 @@ def update_status(
     """Update status."""
     user = current_accounts.datastore.get_user_by_email(user_email)
     identity = get_identity(user)
-    response = cms_service.set_status(identity, campusonline_id, status, date)
+    response = cms_service.set_status(
+        identity,
+        campusonline_id,
+        status,
+        date.strftime("%Y-%m-%dT%H:%M:%S"),
+    )
     color = Color.success if not no_color else Color.neutral
     secho(f"response: {response}", fg=color)
