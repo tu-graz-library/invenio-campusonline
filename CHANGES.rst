@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.4.3 (release 2024-03-14)
+
+- fix: cli used wrong cms api words
+
+
 Version v0.4.2 (release 2024-03-12)
 
 - fix: parameter ordering
