@@ -75,8 +75,9 @@ class CampusOnlineAPI:
     ) -> bool:
         """Set status."""
         root = self.connection.post_status(cms_id, status, date)
-        xpath = "{http://www.campusonline.at/thesisservice/basetypes}errorMessage"
+        xpath = "faultstring"
         ele = root.find(xpath)
+
         if ele is not None:
             error_message = ele.text
             msg = f"Set status on {cms_id} went wrong with {error_message}"
