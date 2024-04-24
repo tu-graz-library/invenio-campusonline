@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.4.4 (release 2024-04-24)
+
+- fix: change not applied to all places
+
+
 Version v0.4.3 (release 2024-03-14)
 
 - fix: cli used wrong cms api words
