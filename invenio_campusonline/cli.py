@@ -102,10 +102,10 @@ def full_sync(cms_service: CampusOnlineRESTService, user_email: str) -> None:
 def duplicate_check(cms_service: CampusOnlineRESTService, campusonline_id: str) -> None:
     """Duplicate check."""
     duplicate_func = current_app.config["CAMPUSONLINE_DUPLICATE_FUNC"]
-    theses_filters = current_app.config["CAMPUSONLINE_THESES_FILTERS"]
+    theses_filter = current_app.config["CAMPUSONLINE_THESES_FILTER"]
 
     if campusonline_id == "":
-        ids = cms_service.fetch_all_ids(theses_filters)
+        ids = cms_service.fetch_all_ids(theses_filter)
     else:
         ids = [campusonline_id]
 
