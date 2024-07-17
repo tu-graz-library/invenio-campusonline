@@ -11,7 +11,7 @@
 from datetime import date as Date
 from pathlib import Path
 from shutil import copyfileobj
-from xml.etree.ElementTree import Element, fromstring
+from xml.etree.ElementTree import Element, ParseError, fromstring
 
 from requests import ReadTimeout, get, post
 
@@ -161,7 +161,10 @@ class CampusOnlineConnection:
         except ReadTimeout as exc:
             raise CampusOnlineRESTError(code=550, msg=str(exc)) from exc
 
-        return fromstring(response.text)
+        try:
+            return fromstring(response.text)
+        except ParseError as exc:
+            raise CampusOnlineRESTError(code=550, msg=str(exc)) from exc
 
     def post_ids(self, theses_filter: ThesesFilter) -> Element:
         """Post ids."""
