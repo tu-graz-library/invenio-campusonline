@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.5.0 (release 2024-07-19)
+
+- setup: moved to support python3.12 only
+- fix: proxy ParseError
+
+
 Version v0.4.4 (release 2024-04-24)
 
 - fix: change not applied to all places
