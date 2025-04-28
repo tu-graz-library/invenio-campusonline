@@ -2,14 +2,12 @@
 requires = ["setuptools", "wheel", "babel>2.8"]
 build-backend = "setuptools.build_meta"
 
-
 [tool.ruff]
 exclude = ["docs"]
 
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-  "ANN101", "ANN102",
   "D203", "D211", "D212", "D213",
   "DTZ007",
   "FA",
@@ -26,4 +24,11 @@ ignore = [
   "TID252",
   "TRY400",
   "UP009",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**.py" = [
+  "ARG001",
+  "FBT001",
+  "SLF001",
 ]
