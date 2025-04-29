@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version v0.6.0 (release 2025-04-29)
+
+- chore: maintenance
+- setup: add python 3.13 support
+- global: add import job
+
+
 Version v0.5.0 (release 2024-07-19)
 
 - setup: moved to support python3.12 only
