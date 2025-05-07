@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.6.1 (release 2025-05-07)
+
+- jobs: add logger infos
+
+
 Version v0.6.0 (release 2025-04-29)
 
 - chore: maintenance
