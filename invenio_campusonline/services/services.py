@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
 """Services."""
-
 
 from datetime import date as Date
 from xml.etree.ElementTree import Element
@@ -54,6 +53,6 @@ class CampusOnlineRESTService:
         cms_id: CampusOnlineID,
         status: CampusOnlineStatus,
         date: Date,
-    ) -> bool:
+    ) -> None:
         """Set Status."""
         self.api.set_status(cms_id, status, date)

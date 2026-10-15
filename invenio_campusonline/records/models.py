@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-campusonline is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -198,6 +198,10 @@ class CampusOnlineConnection:
         date: Date,
     ) -> Element:
         """Post status."""
-        body = self.post_xml.create_request_body_status(cms_id, status, date)
+        body = self.post_xml.create_request_body_status(
+            cms_id,
+            status,
+            date.strftime("%Y-%m-%dT%H:%M:%S"),
+        )
         headers = self.post_xml.create_request_header("setThesisStatusByIDRequest")
         return self.post(body, headers)
