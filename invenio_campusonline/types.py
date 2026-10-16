@@ -54,18 +54,6 @@ class Embargo:
         return bool(self.start and self.end)
 
 
-@dataclass(frozen=True)
-class Color:
-    """The class is for the output color management."""
-
-    neutral = "black"
-    error = "red"
-    warning = "yellow"
-    abort = "magenta"
-    success = "green"
-    alternate = ("blue", "cyan")
-
-
 @dataclass
 class ThesesFilter:
     """Filter dataclass."""

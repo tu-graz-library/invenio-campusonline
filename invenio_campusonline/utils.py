@@ -3,20 +3,10 @@
 
 """Command line interface to interact with the CampusOnline-Connector module."""
 
-from datetime import date as Date
 from datetime import datetime
 from xml.etree.ElementTree import Element
 
 from .types import Embargo
-
-
-def as_date(
-    ctx,  # noqa: ANN001, ARG001
-    param,  # noqa: ANN001, ARG001
-    value: datetime,
-) -> Date:
-    """As Date."""
-    return value.date()
 
 
 def extract_embargo_range(thesis: Element) -> Element:
