@@ -9,7 +9,7 @@ from xml.etree.ElementTree import Element
 from .types import Embargo
 
 
-def extract_embargo_range(thesis: Element) -> Element:
+def extract_embargo_range(thesis: Element) -> Embargo:
     """Extract the embargo range."""
     ns = "http://www.campusonline.at/thesisservice/basetypes"
     xpath_start = f".//{{{ns}}}attr[@key='SPVON']"

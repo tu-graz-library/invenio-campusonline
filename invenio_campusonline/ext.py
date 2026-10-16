@@ -11,7 +11,7 @@ from .services import CampusOnlineRESTService, CampusOnlineRESTServiceConfig
 class InvenioCampusonline:
     """invenio-campusonline extension."""
 
-    def __init__(self, app: Flask = None) -> None:
+    def __init__(self, app: Flask | None = None) -> None:
         """Extension initialization."""
         if app:
             self.init_app(app)

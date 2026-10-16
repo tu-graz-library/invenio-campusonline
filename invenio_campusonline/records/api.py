@@ -45,7 +45,7 @@ class CampusOnlineAPI:
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}docUrl"
         file_url = next(root.iter(xpath))
 
-        return file_url.text
+        return file_url.text or ""
 
     def get_metadata(self, campusonline_id: CampusOnlineID) -> Element:
         """Get Metadata."""
