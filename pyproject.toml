@@ -1,14 +1,95 @@
-[build-system]
-requires = ["setuptools", "wheel", "babel>2.8"]
-build-backend = "setuptools.build_meta"
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2021-2026 Graz University of Technology.
+#
+# invenio-campusonline is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
 
-[tool.ruff]
-exclude = ["docs"]
+[project]
+name = "invenio-campusonline"
+description = "The module is used to import/export from/to the CampusOnline System."
+keywords = ["invenio"]
+license = { file = "LICENSE" }
+author = [{ name = "Graz University of Technology", email = "info@tugraz.at" }]
+dynamic = ["version"]
+urls = { Repository = "https://github.com/tu-graz-library/invenio-campusonline" }
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.12"
+
+dependencies = [
+  "click>=8.0.0",
+  "click-params>=0.4.0",
+  "invenio-access>=2.0.0",
+  "invenio-accounts>=3.0.0",
+  "invenio-celery>=1.2.5",
+  "invenio-jobs>=3.0.0",
+  "requests>=2.0.0",
+]
+
+[project.entry-points."flask.commands"]
+campusonline = "invenio_campusonline.cli:campusonline"
+
+[project.entry-points."invenio_base.apps"]
+invenio_campusonline = "invenio_campusonline:InvenioCampusonline"
+
+[project.entry-points."invenio_celery.tasks"]
+invenio_campusonline = "invenio_campusonline.tasks"
+
+[project.entry-points."invenio_jobs.jobs"]
+campusonline_import = "invenio_campusonline.jobs:ImportThesesFromCampusonlineJob"
+
+[project.optional-dependencies]
+tests = [
+  "invenio-app>=2.0.0",
+  "pytest-black-ng>=0.4.0",
+  "pytest-invenio>=1.4.0",
+  "ruff>=0.2.1",
+  "sphinx>=4.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "invenio_campusonline/__init__.py"
+
+[tool.hatch.build]
+exclude = [
+  ".github/**",
+  "tests/**",
+  ".gitignore",
+  "run-tests.sh",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+extra_checks = true
+strict = true
+strict_bytes = true
+strict_equality = true
+follow_untyped_imports = true
+disallow_any_generics = false
+python_executable = ".venv/bin/python"
+
+[tool.pytest.ini_options]
+addopts = "--black --isort --cov=invenio_campusonline --cov-report=term-missing"
+testpaths = "tests invenio_campusonline"
 
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-  "D203", "D211", "D212", "D213",
+  "D203",
+  "D211",
+  "D212",
+  "D213",
   "DTZ007",
   "FA",
   "FIX002",
@@ -18,10 +99,12 @@ ignore = [
   "PERF203",
   "PLR0913",
   "RET504",
-  "S101", "S314",
+  "S101",
+  "S314",
   "SIM117",
   "TC006",
-  "TD002", "TD003",
+  "TD002",
+  "TD003",
   "TID252",
   "TRY400",
   "UP009",
