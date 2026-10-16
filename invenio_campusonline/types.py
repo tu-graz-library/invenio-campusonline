@@ -41,16 +41,22 @@ The address does not have to have a special format, but it has to be an email.
 class Embargo:
     """The class is for the embargo management."""
 
-    start: datetime = None
-    end: datetime = None
+    start: datetime | None = None
+    end: datetime | None = None
 
     @property
     def end_date(self) -> str:
         """Calculate str date in format %Y-%m-%d."""
+        if not self.end:
+            msg = "embargo end isn't set."
+            raise RuntimeError(msg)
         return self.end.strftime("%Y-%m-%d")
 
     def __bool__(self) -> bool:
         """Check if values are set, otherwise return is false."""
+        if not self.start or not self.end:
+            msg = "embargo end and embargo start have to be set."
+            raise RuntimeError(msg)
         return bool(self.start and self.end)
 
 

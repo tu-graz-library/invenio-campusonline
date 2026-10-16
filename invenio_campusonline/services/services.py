@@ -22,7 +22,7 @@ class CampusOnlineRESTService:
         self.api = self.api_cls(config=config)
 
     @property
-    def api_cls(self) -> CampusOnlineAPI:
+    def api_cls(self) -> type[CampusOnlineAPI]:
         """Get api cls."""
         return self._config.api_cls
 
