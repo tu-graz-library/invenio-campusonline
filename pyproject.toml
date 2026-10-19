@@ -6,7 +6,7 @@ name = "invenio-campusonline"
 description = "The module is used to import/export from/to the CampusOnline System."
 keywords = ["invenio"]
 license = { file = "LICENSE" }
-author = [{ name = "Graz University of Technology", email = "info@tugraz.at" }]
+authors = [{ name = "Graz University of Technology", email = "info@tugraz.at" }]
 dynamic = ["version"]
 urls = { Repository = "https://github.com/tu-graz-library/invenio-campusonline" }
 classifiers = [
