@@ -8,7 +8,7 @@ from .proxies import current_campusonline
 from .services import CampusOnlineRESTService
 from .types import CampusOnlineID, ThesesFilter
 
-__version__ = "0.7.2"
+__version__ = "0.7.3"
 
 __all__ = (
     "CampusOnlineID",
