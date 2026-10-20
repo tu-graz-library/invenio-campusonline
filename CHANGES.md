@@ -5,6 +5,10 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.7.6 (released 2026-10-20)
+
+- chore(deps): remove unused deps
+
 ## Version v0.7.5 (released 2026-10-20)
 
 - fix: release process fifth attempt
