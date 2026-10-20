@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.7.1 (released 2026-10-20)
+
+- fix: release process only
+
+
 ## Version v0.7.0 (released 2026-10-20)
 
 - fix(build): wrong syntax
