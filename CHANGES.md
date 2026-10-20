@@ -5,6 +5,19 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.7.0 (released 2026-10-20)
+
+- fix(build): wrong syntax
+- fix(md): subtitle wrong syntax
+- chore(types): improve
+- chore(cli): use jobs instead of cli
+- refactor: replaced by jobs
+- chore(licenses): update license headers to use SPDX
+- chore: move to hatchling
+- chore: migrate to markdown files
+- chore: remove unused files
+- chore(types): improve types
+
 ## Version v0.6.1 (release 2025-05-07)
 
 - jobs: add logger infos
