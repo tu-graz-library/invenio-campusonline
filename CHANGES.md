@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.7.5 (released 2026-10-20)
+
+- fix: release process fifth attempt
+
+
 ## Version v0.7.4 (released 2026-10-20)
 
 - fix: release process forth attempt
