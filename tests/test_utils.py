@@ -5,8 +5,6 @@
 
 from xml.etree.ElementTree import Element, fromstring, tostring
 
-import pytest
-
 from invenio_campusonline.records.models import CampusOnlineRESTPOSTXML
 from invenio_campusonline.types import Embargo, ThesesFilter
 from invenio_campusonline.utils import extract_embargo_range
@@ -129,9 +127,7 @@ def test_extract_embargo_range(minimal_record: Element) -> None:
     embargo = extract_embargo_range(minimal_record)
     assert embargo.end_date == "2025-03-03"
 
-    with pytest.raises(RuntimeError):
-        assert bool(Embargo()) is False
+    assert bool(Embargo()) is False
 
     embargo = extract_embargo_range(Element("root"))
-    with pytest.raises(RuntimeError):
-        assert bool(embargo) is False
+    assert bool(embargo) is False
