@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.7.7 (released 2026-11-19)
+
+- fix(embargo): None is valid for bool
+- chore(publish): migrate to trusted publisher
+
 ## Version v0.7.6 (released 2026-10-20)
 
 - chore(deps): remove unused deps
