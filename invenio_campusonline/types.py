@@ -54,9 +54,6 @@ class Embargo:
 
     def __bool__(self) -> bool:
         """Check if values are set, otherwise return is false."""
-        if not self.start or not self.end:
-            msg = "embargo end and embargo start have to be set."
-            raise RuntimeError(msg)
         return bool(self.start and self.end)
 
 
